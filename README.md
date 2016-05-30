@@ -1,7 +1,7 @@
 # hellofresh/engine
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9324580cb791453cb6df44f25da73f81)](https://www.codacy.com/app/hellofresh/engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hellofresh/engine&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/8a627d4e59bb4e118363037e653bfe8e)](https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hellofresh/chassis&amp;utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9324580cb791453cb6df44f25da73f81)](https://www.codacy.com/app/hellofresh/engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hellofresh/engine&amp;utm_campaign=Badge_Coverage)
 
 Welcome to HelloFresh Engine!!
 
