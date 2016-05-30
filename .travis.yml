@@ -10,8 +10,7 @@ before_script:
   - composer install --prefer-dist
 
 script:
- - bin/phpunit --coverage-clover build/logs/clover.xml
+ - vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
- - php bin/codacycoverage clover build/logs/clover.xml
- 
+ - vendor/bin/codacycoverage clover build/logs/clover.xml
