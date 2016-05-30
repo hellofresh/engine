@@ -1,0 +1,5 @@
+---
+HelloFresh\Tests\Engine\Mock\SomethingHappened:
+  properties:
+    occurredOn:
+      type: DateTime

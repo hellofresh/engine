@@ -1,0 +1,5 @@
+---
+HelloFresh\Engine\Domain\AggregateId:
+  properties:
+    value:
+      type: uuid

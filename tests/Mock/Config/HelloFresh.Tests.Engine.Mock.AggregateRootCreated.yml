@@ -1,0 +1,9 @@
+---
+HelloFresh\Tests\Engine\Mock\AggregateRootCreated:
+  properties:
+    occurredOn:
+      type: DateTime
+    aggregateRoot:
+      type: HelloFresh\Engine\Domain\AggregateId
+    name:
+      type: string
