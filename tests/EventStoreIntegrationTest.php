@@ -20,7 +20,7 @@ use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\SerializerBuilder;
 use Predis\Client;
 
-class EventStoreIntragationTest extends \PHPUnit_Framework_TestCase
+class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
