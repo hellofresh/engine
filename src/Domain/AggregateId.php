@@ -35,12 +35,12 @@ class AggregateId implements AggregateIdInterface
      * @param  string $string
      * @return AggregateIdInterface
      */
-    public static function fromString($string) : AggregateIdInterface
+    public static function fromString($string)
     {
         return new static(Uuid::fromString($string));
     }
 
-    public static function generate() : AggregateId
+    public static function generate()
     {
         return new static(Uuid::uuid4());
     }
