@@ -24,7 +24,7 @@ class AggregateId implements AggregateIdInterface
      *
      * @return string
      */
-    public function __toString() : string
+    public function __toString()
     {
         return $this->value->toString();
     }
