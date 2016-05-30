@@ -1,5 +1,12 @@
 language: php
 
+env:
+    global:
+        - REDIS_HOST=localhost
+
+services:
+  - redis-server
+
 php:
   - 5.6
   - 7.0

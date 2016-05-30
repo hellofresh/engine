@@ -51,9 +51,19 @@ class AggregateRoot implements AggregateRootInterface
         return $this->name;
     }
 
+    public function assignName($name)
+    {
+        $this->recordThat(new NameAssigned($this->aggregateId, $name));
+    }
+
     public function whenAggregateRootCreated(AggregateRootCreated $event)
     {
         $this->aggregateId = $event->getAggregateId();
+        $this->name = $event->getName();
+    }
+
+    public function whenNameAssigned(NameAssigned $event)
+    {
         $this->name = $event->getName();
     }
 
