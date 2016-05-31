@@ -3,9 +3,11 @@ language: php
 env:
     global:
         - REDIS_HOST=localhost
+        - MONGO_HOST=localhost
 
 services:
   - redis-server
+  - mongodb
 
 php:
   - 5.6

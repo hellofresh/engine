@@ -21,7 +21,8 @@
     "symfony/var-dumper": "^3.0",
     "codacy/coverage": "dev-master",
     "jms/serializer": "^1.1",
-    "predis/predis": "^1.0"
+    "predis/predis": "^1.0",
+    "mongodb/mongodb": "^1.0.0"
   },
   "autoload": {
     "psr-4": {
