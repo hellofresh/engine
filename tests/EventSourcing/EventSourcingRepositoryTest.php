@@ -10,8 +10,8 @@ use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\EventStoreInterface;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStoreInterface;
-use HelloFresh\Engine\EventStore\Snapshot\SnapshotStrategyInterface;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
+use HelloFresh\Engine\EventStore\Snapshot\Strategy\SnapshotStrategyInterface;
 use HelloFresh\Tests\Engine\Mock\AggregateRoot;
 use Prophecy\Argument;
 
@@ -62,10 +62,14 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $snapshotStore = $this->prophesize(SnapshotStoreInterface::class);
 
+        $strategy = $this->prophesize(SnapshotStrategyInterface::class);
+        $strategy->isFulfilled($aggregateRoot)->shouldBeCalled()->willReturn(true);
+        $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
+
         $repo = new AggregateRepository(
             $this->eventStore->reveal(),
             $this->eventBus->reveal(),
-            $snapshotStore->reveal()
+            $snapshotter
         );
         $repo->save($aggregateRoot);
     }
@@ -87,10 +91,14 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $snapshotStore->has($aggregateRoot->getAggregateRootId(), $version)->shouldBeCalled()->willReturn(false);
         $snapshotStore->save(Argument::type(Snapshot::class))->shouldBeCalled();
 
+        $strategy = $this->prophesize(SnapshotStrategyInterface::class);
+        $strategy->isFulfilled($aggregateRoot)->shouldBeCalled()->willReturn(true);
+        $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
+
         $repo = new AggregateRepository(
             $this->eventStore->reveal(),
             $this->eventBus->reveal(),
-            $snapshotStore->reveal()
+            $snapshotter
         );
         $repo->save($aggregateRoot);
     }

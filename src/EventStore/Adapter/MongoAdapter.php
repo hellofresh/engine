@@ -40,7 +40,7 @@ class MongoAdapter implements EventStoreAdapterInterface
         $query['aggregate_id'] = (string)$id;
 
         $collection = $this->getCollection();
-        $serializedEvents = $collection->find($query, ['sort' => ['version' => 1]]);
+        $serializedEvents = $collection->find($query)->sort(['version' => \MongoCollection::ASCENDING]);
 
         return $this->processEvents($serializedEvents);
     }
@@ -54,7 +54,7 @@ class MongoAdapter implements EventStoreAdapterInterface
         }
 
         $collection = $this->getCollection();
-        $serializedEvents = $collection->find($query, ['sort' => ['version' => 1]]);
+        $serializedEvents = $collection->find($query)->sort(['version' => \MongoCollection::ASCENDING]);;
 
         return $this->processEvents($serializedEvents);
     }
@@ -65,24 +65,6 @@ class MongoAdapter implements EventStoreAdapterInterface
         $collection = $this->getCollection();
 
         return $collection->count($query);
-    }
-
-    private function processEvents($serializedEvents)
-    {
-        $eventStream = [];
-
-        foreach ($serializedEvents as $eventData) {
-            $payload = $this->serializer->deserialize($eventData['payload'], $eventData['type'], 'json');
-
-            $eventStream[] = new DomainMessage(
-                $eventData['aggregate_id'],
-                $eventData['version'],
-                $payload,
-                \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u', $eventData['recorded_on'])
-            );
-        }
-
-        return $eventStream;
     }
 
     /**
