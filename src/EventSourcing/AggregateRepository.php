@@ -10,7 +10,7 @@ use HelloFresh\Engine\EventStore\EventStoreInterface;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStoreInterface;
 
-class EventSourcingRepository implements EventSourcingRepositoryInterface
+class AggregateRepository implements EventSourcingRepositoryInterface
 {
     /**
      * @var EventStoreInterface

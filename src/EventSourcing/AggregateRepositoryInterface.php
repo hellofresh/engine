@@ -4,7 +4,7 @@ namespace HelloFresh\Engine\EventSourcing;
 
 use HelloFresh\Engine\Domain\AggregateRootInterface;
 
-interface EventSourcingRepositoryInterface
+interface AggregateRepositoryInterface
 {
     public function load($id, $aggregateType);
 
