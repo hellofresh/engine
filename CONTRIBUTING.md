@@ -1,39 +1,71 @@
-# Contributing
+# Request for contributions
 
-Contributions are **welcome** and will be fully **credited**.
+Please contribute to this repository if any of the following is true:
+- You have expertise in community development, communication, or education
+- You want open source communities to be more collaborative and inclusive
+- You want to help lower the burden to first time contributors
 
-Before to write any single line of code, we encourage contributors to read our [Wiki](https://github.com/hellofresh/engine/wiki).
+# How to contribute
 
-We accept contributions via Pull Requests on [Github](https://github.com/hellofresh/engine).
+Prerequisites:
 
-## Pull Requests
+- familiarity with [GitHub PRs](https://help.github.com/articles/using-pull-requests) (pull requests) and issues
+- knowledge of Markdown for editing `.md` documents
 
-- **Add tests!** - Your patch won't be accepted if it doesn't have tests.
+In particular, this community seeks the following types of contributions:
 
-- **Document any change in behaviour** - Make sure the `README.md` and any other relevant documentation are kept up-to-date.
+- ideas: participate in an Issues thread or start your own to have your voice
+heard
+- resources: submit a PR to add to [docs README.md](README.md) with links to related content
+- outline sections: help us ensure that this repository is comprehensive. if
+there is a topic that is overlooked, please add it, even if it is just a stub
+in the form of a header and single sentence. Initially, most things fall into
+this category
+- write: contribute your expertise in an area by helping us expand the included
+content
+- copy editing: fix typos, clarify language, and generally improve the quality
+of the content
+- formatting: help keep content easy to read with consistent formatting
+- code: Fix issues or contribute new features to this or any related projects
 
-- **Create feature branches** - Don't ask us to pull from your master branch.
+# Conduct
 
-- **One pull request per feature** - If you want to do more than one thing, send multiple pull requests.
+We are committed to providing a friendly, safe and welcoming environment for
+all, regardless of gender, sexual orientation, disability, ethnicity, religion,
+or similar personal characteristic.
 
-- **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please squash them before submitting.
+Please be kind and courteous. There's no need to be mean or rude.
+Respect that people have differences of opinion and that every design or
+implementation choice carries a trade-off and numerous costs. There is seldom
+a right answer, merely an optimal answer given a set of values and
+circumstances.
 
-## Deployments
+Please keep unstructured critique to a minimum. If you have solid ideas you
+want to experiment with, make a fork and see how it works.
 
-Deployments on the carrier service follows the current flow:
+We will exclude you from interaction if you insult, demean or harass anyone.
+That is not welcome behavior. We interpret the term "harassment" as
+including the definition in the
+[Citizen Code of Conduct](http://citizencodeofconduct.org/);
+if you have any lack of clarity about what might be included in that concept,
+please read their definition. In particular, we don't tolerate behavior that
+excludes people in socially marginalized groups.
 
-- Any feature that is merged into master a CI build will be triggered and deployed to **staging** automatically (If the tests pass)
+Private harassment is also unacceptable. No matter who you are, if you feel
+you have been or are being harassed or made uncomfortable by a community
+member, please contact one of the
+[hellofresh](https://github.com/orgs/hellofresh/people) core team
+immediately. Whether you're a regular contributor or a newcomer, we care about
+making this community a safe place for you and we've got your back.
 
-- If the Product owner and Team Lead agreed that what we have on master is enough to go live, we create a release (tag)
+Likewise any spamming, trolling, flaming, baiting or other attention-stealing
+behavior is not welcome.
 
-- After a tag is created a CI build will be triggered and deployed to **live** automatically (If the tests pass)
+# Communication
 
-- **Consider our release cycle** - We try to follow [SemVer v2.0.0](http://semver.org/). Randomly breaking public APIs is not an option.
+GitHub issues are the primary way for communicating about specific proposed
+changes to this project.
 
-## Running Tests
-
-``` bash
-$ bin/phpunit
-```
-
-**Happy coding**!
+In both contexts, please follow the conduct guidelines above. Language issues
+are often contentious and we'd like to keep discussion brief, civil and focused
+on what we're actually doing, not wandering off into too much imaginary stuff.

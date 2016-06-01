@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://hellofresh.com">
+    <img width="120" src="https://www.hellofresh.de/images/hellofresh/press/HelloFresh_Logo.png">
+  </a>
+</p>
+
 # hellofresh/engine
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9324580cb791453cb6df44f25da73f81)](https://www.codacy.com/app/hellofresh/engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hellofresh/engine&amp;utm_campaign=Badge_Grade)
