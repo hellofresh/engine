@@ -2,22 +2,14 @@
 
 namespace HelloFresh\Engine\EventStore\Snapshot;
 
-class CountSnapshotStrategy
+use HelloFresh\Engine\Domain\AggregateRootInterface;
+
+interface SnapshotStrategyInterface
 {
     /**
-     * @var int
+     * Checks if a condition is fulfilled
+     * @param AggregateRootInterface $aggregate
+     * @return bool if the condition is fulfilled returns TRUE, otherwise FALSE
      */
-    private $count;
-
-    /**
-     * CountSnapshotStrategy constructor.
-     * @param int $count
-     */
-    public function __construct($count)
-    {
-        $this->count = $count;
-    }
-
-    
-
+    public function isFulfilled(AggregateRootInterface $aggregate);
 }

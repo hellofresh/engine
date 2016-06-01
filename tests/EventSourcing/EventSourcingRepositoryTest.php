@@ -6,7 +6,7 @@ use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\Domain\EventStream;
 use HelloFresh\Engine\EventBus\EventBusInterface;
-use HelloFresh\Engine\EventSourcing\EventSourcingRepository;
+use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\EventStoreInterface;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStoreInterface;
@@ -42,7 +42,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $stream = $aggregateRoot->getEventStream();
         $this->setUpForEventStream($stream);
 
-        $repo = new EventSourcingRepository($this->eventStore->reveal(), $this->eventBus->reveal());
+        $repo = new AggregateRepository($this->eventStore->reveal(), $this->eventBus->reveal());
         $repo->save($aggregateRoot);
     }
 
@@ -60,7 +60,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $snapshotStore = $this->prophesize(SnapshotStoreInterface::class);
 
-        $repo = new EventSourcingRepository(
+        $repo = new AggregateRepository(
             $this->eventStore->reveal(),
             $this->eventBus->reveal(),
             $snapshotStore->reveal()
@@ -85,7 +85,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $snapshotStore->has($aggregateRoot->getAggregateRootId(), $version)->shouldBeCalled()->willReturn(false);
         $snapshotStore->save(Argument::type(Snapshot::class))->shouldBeCalled();
 
-        $repo = new EventSourcingRepository(
+        $repo = new AggregateRepository(
             $this->eventStore->reveal(),
             $this->eventBus->reveal(),
             $snapshotStore->reveal()
@@ -117,7 +117,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
             $version
         )->shouldBeCalled()->willReturn($stream);
 
-        $repo = new EventSourcingRepository(
+        $repo = new AggregateRepository(
             $this->eventStore->reveal(),
             $this->eventBus->reveal(),
             $snapshotStore->reveal()

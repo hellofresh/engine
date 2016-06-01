@@ -3,20 +3,20 @@
 namespace HelloFresh\Tests\Engine\Mock;
 
 
-use HelloFresh\Engine\EventSourcing\EventSourcingRepositoryInterface;
+use HelloFresh\Engine\EventSourcing\AggregateRepositoryInterface;
 
 class AssignNameHandler
 {
     /**
-     * @var EventSourcingRepositoryInterface
+     * @var AggregateRepositoryInterface
      */
     private $repo;
 
     /**
      * AssignNameHandler constructor.
-     * @param EventSourcingRepositoryInterface $repo
+     * @param AggregateRepositoryInterface $repo
      */
-    public function __construct(EventSourcingRepositoryInterface $repo)
+    public function __construct(AggregateRepositoryInterface $repo)
     {
         $this->repo = $repo;
     }

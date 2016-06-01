@@ -47,7 +47,7 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
         $eventStore = $this->configureEventStore($this->config->get('event_store'));
         $snapshotStore = $this->configureSnapshotStore($this->config->get('snapshot_store'));
 
-        return new EventSourcingRepository($eventStore, $eventBus, $snapshotStore);
+        return new AggregateRepository($eventStore, $eventBus, $snapshotStore);
     }
 
     private function configureEventStore(MapInterface $config)

@@ -4,97 +4,50 @@ namespace HelloFresh\Engine\EventStore\Snapshot;
 
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\AggregateRootInterface;
+use HelloFresh\Engine\Domain\DomainMessage;
 
 class Snapshotter
 {
     /**
-     * @var string
+     * @var SnapshotStoreInterface
      */
-    private $version;
+    private $snapshotStore;
 
     /**
-     * @var AggregateIdInterface
+     * @var SnapshotStrategyInterface
      */
-    private $aggregateId;
+    protected $strategy;
 
     /**
-     * @var AggregateRootInterface
+     * Snapshotter constructor.
+     * @param SnapshotStoreInterface $snapshotStore
+     * @param SnapshotStrategyInterface $strategy
      */
-    private $aggregate;
+    public function __construct(SnapshotStoreInterface $snapshotStore, SnapshotStrategyInterface $strategy)
+    {
+        $this->snapshotStore = $snapshotStore;
+        $this->strategy = $strategy;
+    }
 
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $createdAt;
+    public function take(AggregateRootInterface $aggregate, DomainMessage $message)
+    {
+        $id = $aggregate->getAggregateRootId();
 
-    /**
-     * Snapshot constructor.
-     * @param AggregateIdInterface $aggregateId
-     * @param AggregateRootInterface $aggregate
-     * @param string $version
-     * @param \DateTimeImmutable $createdAt
-     */
-    public function __construct(
-        AggregateIdInterface $aggregateId,
-        AggregateRootInterface $aggregate,
-        $version,
-        \DateTimeImmutable $createdAt
-    ) {
-        $this->aggregateId = $aggregateId;
-        $this->aggregate = $aggregate;
-        $this->version = $version;
-        $this->createdAt = $createdAt;
+        if (!$this->strategy->isFulfilled($aggregate)) {
+            return false;
+        }
+
+        if (!$this->snapshotStore->has($id, $message->getVersion())) {
+            $this->snapshotStore->save(Snapshot::take($id, $aggregate, $message->getVersion()));
+        }
     }
 
     /**
-     * Take a snapshot
-     * @param AggregateIdInterface $aggregateId
-     * @param AggregateRootInterface $aggregate
-     * @param $version
-     * @return static
+     * @param AggregateIdInterface $id
+     * @return Snapshot
      */
-    public static function take(AggregateIdInterface $aggregateId, AggregateRootInterface $aggregate, $version)
+    public function get(AggregateIdInterface $id)
     {
-        return new static($aggregateId, $aggregate, $version, new \DateTimeImmutable());
-    }
-
-    /**
-     * @return string
-     */
-    public function getVersion()
-    {
-        return $this->version;
-    }
-
-    /**
-     * @return AggregateRootInterface
-     */
-    public function getAggregate()
-    {
-        return $this->aggregate;
-    }
-
-    /**
-     * @return AggregateIdInterface
-     */
-    public function getAggregateId()
-    {
-        return $this->aggregateId;
-    }
-
-    /**
-     * @return \DateTimeImmutable
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return get_class($this->aggregate);
+        return $this->snapshotStore->byId($id);
     }
 }

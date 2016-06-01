@@ -7,10 +7,9 @@ use HelloFresh\Engine\Domain\AggregateRootInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\EventBus\EventBusInterface;
 use HelloFresh\Engine\EventStore\EventStoreInterface;
-use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
-use HelloFresh\Engine\EventStore\Snapshot\SnapshotStoreInterface;
+use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
 
-class AggregateRepository implements EventSourcingRepositoryInterface
+class AggregateRepository implements AggregateRepositoryInterface
 {
     /**
      * @var EventStoreInterface
@@ -23,23 +22,23 @@ class AggregateRepository implements EventSourcingRepositoryInterface
     private $eventBus;
 
     /**
-     * @var \HelloFresh\Engine\EventStore\Snapshot\SnapshotStoreInterface
+     * @var Snapshotter
      */
-    private $snapshotStore;
+    private $snapshotter;
 
     /**
      * @param EventStoreInterface $eventStore
      * @param EventBusInterface $eventBus
-     * @param SnapshotStoreInterface $snapshotStore
+     * @param Snapshotter $snapshotter
      */
     public function __construct(
         EventStoreInterface $eventStore,
         EventBusInterface $eventBus,
-        SnapshotStoreInterface $snapshotStore = null
+        Snapshotter $snapshotter = null
     ) {
         $this->eventStore = $eventStore;
         $this->eventBus = $eventBus;
-        $this->snapshotStore = $snapshotStore;
+        $this->snapshotter = $snapshotter;
     }
 
     /**
@@ -47,7 +46,7 @@ class AggregateRepository implements EventSourcingRepositoryInterface
      */
     public function load($id, $aggregateType)
     {
-        if ($this->snapshotStore) {
+        if ($this->snapshotter) {
             $aggregateRoot = $this->loadFromSnapshotStore($id);
 
             if ($aggregateRoot) {
@@ -63,21 +62,15 @@ class AggregateRepository implements EventSourcingRepositoryInterface
      */
     public function save(AggregateRootInterface $aggregate)
     {
-        $id = $aggregate->getAggregateRootId();
         $eventStream = $aggregate->getUncommittedEvents();
-
-        if ($this->snapshotStore) {
-            $countOfEvents = $this->eventStore->countEventsFor($id);
-            $version = $countOfEvents;
-            
-            if ($countOfEvents && (($countOfEvents % 100) === 0) && !$this->snapshotStore->has($id, $version)) {
-                $this->snapshotStore->save(Snapshot::take($id, $aggregate, $version));
-            }
-        }
-
         $this->eventStore->append($eventStream);
+
         $eventStream->each(function (DomainMessage $domainMessage) {
             $this->eventBus->publish($domainMessage->getPayload());
+        })->each(function (DomainMessage $domainMessage) use ($aggregate) {
+            if ($this->snapshotter) {
+                $this->snapshotter->take($aggregate, $domainMessage);
+            }
         });
     }
 
@@ -86,7 +79,7 @@ class AggregateRepository implements EventSourcingRepositoryInterface
      */
     private function loadFromSnapshotStore(AggregateIdInterface $aggregateId)
     {
-        $snapshot = $this->snapshotStore->byId($aggregateId);
+        $snapshot = $this->snapshotter->get($aggregateId);
 
         if (null === $snapshot) {
             return null;

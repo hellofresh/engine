@@ -8,7 +8,7 @@ namespace HelloFresh\Engine\Domain;
 final class DomainMessage
 {
     /**
-     * @var mixed
+     * @var DomainEventInterface
      */
     private $payload;
 
@@ -50,7 +50,7 @@ final class DomainMessage
     }
 
     /**
-     * {@inheritDoc}
+     * @return DomainEventInterface
      */
     public function getPayload()
     {
@@ -76,10 +76,10 @@ final class DomainMessage
     /**
      * @param string $id
      * @param $version
-     * @param mixed $payload
+     * @param DomainEventInterface $payload
      * @return DomainMessage
      */
-    public static function recordNow($id, $version, $payload)
+    public static function recordNow($id, $version, DomainEventInterface $payload)
     {
         return new DomainMessage($id, $version, $payload, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
     }

@@ -5,12 +5,15 @@ namespace HelloFresh\Tests;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
-use HelloFresh\Engine\EventSourcing\EventSourcingRepository;
+use HelloFresh\Engine\EventSourcing\AggregateRepository;
+use HelloFresh\Engine\EventStore\Adapter\MongoAdapter;
 use HelloFresh\Engine\EventStore\Adapter\MongoDbAdapter;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
 use HelloFresh\Engine\EventStore\EventStore;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\RedisSnapshotAdapter;
+use HelloFresh\Engine\EventStore\Snapshot\CountSnapshotStrategy;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStore;
+use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
 use HelloFresh\Engine\Serializer\Adapter\JmsSerializerAdapter;
 use HelloFresh\Engine\Serializer\Type\ArrayListHandler;
 use HelloFresh\Engine\Serializer\Type\UuidSerializerHandler;
@@ -37,8 +40,9 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $eventStore = new EventStore($eventStoreAdapter);
         $snapshotStore = new SnapshotStore($snapshotAdapter);
+        $snapshotter = new Snapshotter($snapshotStore, new CountSnapshotStrategy($eventStore));
 
-        $aggregateRepo = new EventSourcingRepository($eventStore, $eventBus, $snapshotStore);
+        $aggregateRepo = new AggregateRepository($eventStore, $eventBus, $snapshotter);
 
         $commandBus->subscribe(AssignNameCommand::class, new AssignNameHandler($aggregateRepo));
 
@@ -59,9 +63,7 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         $mongoHost = getenv('MONGO_HOST');
         $mongoPort = getenv('MONGO_PORT') ?: "27017";
 
-        $redis = new RedisClient("tcp://$host:$port");
-        $mongodb = new MongoClient("mongodb://$mongoHost:$mongoPort");
-
+        //Setup serializer
         $jmsSerializer = SerializerBuilder::create()
             ->setMetadataDirs(['' => realpath(__DIR__ . '/Mock/Config')])
             ->configureHandlers(function (HandlerRegistry $registry) {
@@ -70,12 +72,21 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
             })
             ->addDefaultHandlers()
             ->build();
-
         $serializer = new JmsSerializerAdapter($jmsSerializer);
+
+        $redis = new RedisClient("tcp://$host:$port");
+
+        if (version_compare(PHP_VERSION, '7.0', '>=')) {
+            $mongodb = new MongoClient("mongodb://$mongoHost:$mongoPort");
+            $mongodbAdapter = new MongoDbAdapter($mongodb, 'chassis', $serializer);
+        } else {
+            $mongodb = new \MongoClient("mongodb://$mongoHost:$mongoPort");
+            $mongodbAdapter = new MongoAdapter($mongodb, 'chassis', $serializer);
+        }
 
         return [
             [new RedisAdapter($redis, $serializer), new RedisSnapshotAdapter($redis, $serializer)],
-            [new MongoDbAdapter($mongodb, 'chassis', $serializer), new RedisSnapshotAdapter($redis, $serializer)]
+            [$mongodbAdapter, new RedisSnapshotAdapter($redis, $serializer)]
         ];
     }
 }

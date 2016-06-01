@@ -3,7 +3,7 @@
 namespace HelloFresh\Tests\Engine\EventSourcing;
 
 use HelloFresh\Engine\EventSourcing\AggregateRepositoryFactory;
-use HelloFresh\Engine\EventSourcing\EventSourcingRepository;
+use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
 
 class AggregateRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
@@ -15,7 +15,7 @@ class AggregateRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $factory = new AggregateRepositoryFactory();
         $repo = $factory->build();
-        $this->assertInstanceOf(EventSourcingRepository::class, $repo);
+        $this->assertInstanceOf(AggregateRepository::class, $repo);
     }
 //
 //    /**

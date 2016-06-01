@@ -2,46 +2,39 @@
 
 namespace HelloFresh\Engine\EventStore\Snapshot;
 
-use HelloFresh\Engine\Domain\AggregateIdInterface;
-use HelloFresh\Engine\EventStore\Snapshot\Adapter\SnapshotStoreAdapterInterface;
+use HelloFresh\Engine\Domain\AggregateRootInterface;
+use HelloFresh\Engine\EventStore\EventStoreInterface;
 
-class SnapshotStore implements SnapshotStoreInterface
+class CountSnapshotStrategy implements SnapshotStrategyInterface
 {
     /**
-     * @var SnapshotStoreAdapterInterface
+     * @var int
      */
-    private $adapter;
+    private $count;
 
     /**
-     * SnapshotStore constructor.
-     * @param SnapshotStoreAdapterInterface $adapter
+     * @var EventStoreInterface
      */
-    public function __construct(SnapshotStoreAdapterInterface $adapter)
+    private $eventStore;
+
+    /**
+     * CountSnapshotStrategy constructor.
+     * @param EventStoreInterface $eventStore
+     * @param int $count
+     */
+    public function __construct(EventStoreInterface $eventStore, $count = 100)
     {
-        $this->adapter = $adapter;
+        $this->count = $count;
+        $this->eventStore = $eventStore;
     }
 
     /**
      * @inheritdoc
      */
-    public function byId(AggregateIdInterface $id)
+    public function isFulfilled(AggregateRootInterface $aggregate)
     {
-        return $this->adapter->byId($id);
-    }
+        $countOfEvents = $this->eventStore->countEventsFor($aggregate->getAggregateRootId());
 
-    /**
-     * @inheritdoc
-     */
-    public function has(AggregateIdInterface $id, $version)
-    {
-        return $this->adapter->has($id, $version);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function save(Snapshot $snapshot)
-    {
-        return $this->adapter->save($snapshot);
+        return $countOfEvents && (($countOfEvents % $this->count) === 0);
     }
 }
