@@ -4,13 +4,14 @@ namespace HelloFresh\Engine\EventStore\Adapter;
 
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
-use HelloFresh\Engine\EventStore\Exception\EventStreamNotFoundException;
 use HelloFresh\Engine\Serializer\SerializerInterface;
 use MongoDB\Client;
 use MongoDB\Collection;
 
 class MongoDbAdapter implements EventStoreAdapterInterface
 {
+    use EventProcessorTrait;
+
     const COLLECTION_NAME = 'events';
     /**
      * @var Client
@@ -36,14 +37,7 @@ class MongoDbAdapter implements EventStoreAdapterInterface
 
     public function save(DomainMessage $event)
     {
-        $data = [
-            'aggregate_id' => (string)$event->getId(),
-            'version' => $event->getVersion(),
-            'type' => $event->getType(),
-            'payload' => $this->serializer->serialize($event->getPayload(), 'json'),
-            'recorded_on' => $event->getRecordedOn()->format('Y-m-d\TH:i:s.u'),
-        ];
-
+        $data = $this->createEventData($event);
         $this->getCollection()->insertOne($data);
     }
 
@@ -53,10 +47,6 @@ class MongoDbAdapter implements EventStoreAdapterInterface
 
         $collection = $this->getCollection();
         $serializedEvents = $collection->find($query, ['sort' => ['version' => 1]]);
-
-        if (!$serializedEvents) {
-            throw new EventStreamNotFoundException($id);
-        }
 
         return $this->processEvents($serializedEvents);
     }
@@ -71,10 +61,6 @@ class MongoDbAdapter implements EventStoreAdapterInterface
 
         $collection = $this->getCollection();
         $serializedEvents = $collection->find($query, ['sort' => ['version' => 1]]);
-
-        if (!$serializedEvents) {
-            throw new EventStreamNotFoundException($aggregateId);
-        }
 
         return $this->processEvents($serializedEvents);
     }

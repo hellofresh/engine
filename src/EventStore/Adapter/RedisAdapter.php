@@ -10,6 +10,8 @@ use Predis\ClientInterface;
 
 class RedisAdapter implements EventStoreAdapterInterface
 {
+    use EventProcessorTrait;
+
     /**
      * @var ClientInterface
      */
@@ -28,13 +30,7 @@ class RedisAdapter implements EventStoreAdapterInterface
 
     public function save(DomainMessage $event)
     {
-        $data = $this->serializer->serialize([
-            'uuid' => (string)$event->getId(),
-            'version' => $event->getVersion(),
-            'type' => $event->getType(),
-            'recorded_on' => $event->getRecordedOn()->getTimestamp(),
-            'payload' => $this->serializer->serialize($event->getPayload(), 'json')
-        ], 'json');
+        $data = $this->serializer->serialize($this->createEventData($event), 'json');
 
         $this->redis->lpush('events:' . $event->getId(), $data);
         $this->redis->rpush('published_events', $data);
@@ -65,29 +61,5 @@ class RedisAdapter implements EventStoreAdapterInterface
     public function countEventsFor(AggregateIdInterface $aggregateId)
     {
         return count($this->redis->lrange('events:' . $aggregateId, 0, -1));
-    }
-
-    private function processEvents($serializedEvents)
-    {
-        $eventStream = [];
-
-        foreach ($serializedEvents as $serializedEvent) {
-            $eventData = $this->serializer->deserialize(
-                $serializedEvent,
-                'array',
-                'json'
-            );
-
-            $payload = $this->serializer->deserialize($eventData['payload'], $eventData['type'], 'json');
-
-            $eventStream[] = new DomainMessage(
-                $eventData['uuid'],
-                $eventData['version'],
-                $payload,
-                new \DateTimeImmutable("@" . $eventData['recorded_on'])
-            );
-        }
-
-        return $eventStream;
     }
 }
