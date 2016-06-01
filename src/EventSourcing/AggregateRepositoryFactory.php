@@ -9,6 +9,8 @@ use HelloFresh\Engine\EventStore\Adapter\InMemoryAdapter;
 use HelloFresh\Engine\EventStore\EventStore;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\InMemorySnapshotAdapter;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStore;
+use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
+use HelloFresh\Engine\EventStore\Snapshot\Strategy\CountSnapshotStrategy;
 
 class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
 {
@@ -34,8 +36,15 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
             'event_store' => [
                 'adapter' => InMemoryAdapter::class
             ],
-            'snapshot_store' => [
-                'adapter' => InMemorySnapshotAdapter::class
+            'snapshotter' => [
+                'enabled' => false,
+                'store' => [
+                    'adapter' => InMemorySnapshotAdapter::class
+                ],
+                'strategy' => [
+                    'name' => CountSnapshotStrategy::class,
+                    'arguments' => []
+                ]
             ]
         ]);
         $this->config->concat($config);
@@ -45,9 +54,18 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
     {
         $eventBus = $this->config->get('event_bus')->get('service');
         $eventStore = $this->configureEventStore($this->config->get('event_store'));
-        $snapshotStore = $this->configureSnapshotStore($this->config->get('snapshot_store'));
+        $snapshotter = null;
 
-        return new AggregateRepository($eventStore, $eventBus, $snapshotStore);
+        /** @var MapInterface $snapshotterConfig */
+        $snapshotterConfig = $this->config->get('snapshotter');
+
+        if (true === $snapshotterConfig->get('enabled')) {
+            $snapshotStore = $this->configureSnapshotStore($snapshotterConfig->get('store'));
+            $strategy = $this->configureSnapshotStrategy($snapshotterConfig->get('strategy'));
+            $snapshotter = new Snapshotter($snapshotStore, $strategy);
+        }
+
+        return new AggregateRepository($eventStore, $eventBus, $snapshotter);
     }
 
     private function configureEventStore(MapInterface $config)
@@ -63,6 +81,16 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
     private function configureSnapshotStore(MapInterface $config)
     {
         $adapterName = $config->get('adapter');
+        $arguments = $config->tryGet('arguments', []);
+
+        $adapter = new $adapterName(...$arguments);
+
+        return new SnapshotStore($adapter);
+    }
+
+    private function configureSnapshotStrategy(MapInterface $config)
+    {
+        $adapterName = $config->get('name');
         $arguments = $config->tryGet('arguments', []);
 
         $adapter = new $adapterName(...$arguments);

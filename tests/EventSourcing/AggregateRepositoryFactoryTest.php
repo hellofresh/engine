@@ -2,9 +2,8 @@
 
 namespace HelloFresh\Tests\Engine\EventSourcing;
 
-use HelloFresh\Engine\EventSourcing\AggregateRepositoryFactory;
 use HelloFresh\Engine\EventSourcing\AggregateRepository;
-use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
+use HelloFresh\Engine\EventSourcing\AggregateRepositoryFactory;
 
 class AggregateRepositoryFactoryTest extends \PHPUnit_Framework_TestCase
 {
