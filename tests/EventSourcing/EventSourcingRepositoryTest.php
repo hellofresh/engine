@@ -58,8 +58,6 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $stream = $aggregateRoot->getEventStream();
         $this->setUpForEventStream($stream);
 
-        $this->eventStore->countEventsFor($aggregateRoot->getAggregateRootId())->shouldBeCalled()->willReturn($stream->count());
-
         $snapshotStore = $this->prophesize(SnapshotStoreInterface::class);
 
         $strategy = $this->prophesize(SnapshotStrategyInterface::class);
@@ -88,11 +86,19 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->eventStore->countEventsFor($aggregateRoot->getAggregateRootId())->shouldBeCalled()->willReturn($version);
 
         $snapshotStore = $this->prophesize(SnapshotStoreInterface::class);
-        $snapshotStore->has($aggregateRoot->getAggregateRootId(), $version)->shouldBeCalled()->willReturn(false);
-        $snapshotStore->save(Argument::type(Snapshot::class))->shouldBeCalled();
+
+        $stream->each(function (DomainMessage $domainMessage) use ($snapshotStore, $aggregateRoot) {
+            $snapshotStore->has(
+                $aggregateRoot->getAggregateRootId(),
+                $domainMessage->getVersion()
+            )->shouldBeCalled()->willReturn(false);
+            
+            $snapshotStore->save(Argument::type(Snapshot::class))->shouldBeCalled();
+        });
 
         $strategy = $this->prophesize(SnapshotStrategyInterface::class);
         $strategy->isFulfilled($aggregateRoot)->shouldBeCalled()->willReturn(true);
+
         $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
 
         $repo = new AggregateRepository(
@@ -123,8 +129,6 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $snapshotStore->byId($aggregateRoot->getAggregateRootId())->shouldBeCalled()->willReturn($snapshot);
 
         $strategy = $this->prophesize(SnapshotStrategyInterface::class);
-        $strategy->isFulfilled($aggregateRoot)->shouldBeCalled()->willReturn(true);
-
         $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
 
         $this->eventStore->fromVersion(
