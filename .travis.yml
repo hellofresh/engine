@@ -12,17 +12,15 @@ services:
 php:
   - 5.6
   - 7.0
-  - hhvm
   - nightly
 
 matrix:
     fast_finish: true
 
 before_install:
-  - PHP=$TRAVIS_PHP_VERSION
-  - if [[ $PHP != hhvm ]]; then pecl install mongodb; fi
-  - if [[ $PHP != hhvm ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
-  - if [[ $PHP != hhvm ]]; then echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - pecl install mongodb
+  - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - composer self-update

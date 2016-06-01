@@ -17,12 +17,12 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^5.3",
-    "fzaninotto/faker": "^1.5",
     "symfony/var-dumper": "^3.0",
     "codacy/coverage": "dev-master",
     "jms/serializer": "^1.1",
     "predis/predis": "^1.0",
-    "mongodb/mongodb": "^1.0.0"
+    "mongodb/mongodb": "^1.0.0",
+    "doctrine/dbal": "^2.5"
   },
   "autoload": {
     "psr-4": {
