@@ -17,11 +17,6 @@ class RedisAdapter implements EventStoreAdapterInterface
      */
     private $redis;
 
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
     public function __construct(ClientInterface $redis, SerializerInterface $serializer)
     {
         $this->redis = $redis;
