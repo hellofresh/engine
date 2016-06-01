@@ -11,9 +11,9 @@ use HelloFresh\Engine\EventStore\Adapter\MongoDbAdapter;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
 use HelloFresh\Engine\EventStore\EventStore;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\RedisSnapshotAdapter;
-use HelloFresh\Engine\EventStore\Snapshot\CountSnapshotStrategy;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStore;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
+use HelloFresh\Engine\EventStore\Snapshot\Strategy\CountSnapshotStrategy;
 use HelloFresh\Engine\Serializer\Adapter\JmsSerializerAdapter;
 use HelloFresh\Engine\Serializer\Type\ArrayListHandler;
 use HelloFresh\Engine\Serializer\Type\UuidSerializerHandler;
@@ -25,6 +25,9 @@ use JMS\Serializer\SerializerBuilder;
 use MongoDB\Client as MongoClient;
 use Predis\Client as RedisClient;
 
+/**
+ * @group integration
+ */
 class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 {
     /**

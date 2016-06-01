@@ -5,6 +5,7 @@ namespace HelloFresh\Engine\EventStore\Snapshot;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\AggregateRootInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Engine\EventStore\Snapshot\Strategy\SnapshotStrategyInterface;
 
 class Snapshotter
 {

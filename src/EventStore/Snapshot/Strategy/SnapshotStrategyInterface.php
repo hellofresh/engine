@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Engine\EventStore\Snapshot;
+namespace HelloFresh\Engine\EventStore\Snapshot\Strategy;
 
 use HelloFresh\Engine\Domain\AggregateRootInterface;
 
