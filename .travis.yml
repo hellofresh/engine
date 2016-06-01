@@ -21,8 +21,8 @@ matrix:
 before_install:
   - PHP=$TRAVIS_PHP_VERSION
   - if [[ $PHP != hhvm ]]; then pecl install mongodb; fi
-  - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - if [[ $PHP != hhvm ]]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - if [[ $PHP != hhvm ]]; then echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
 
 install:
   - composer self-update
