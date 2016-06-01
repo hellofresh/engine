@@ -82,9 +82,6 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $stream = $aggregateRoot->getEventStream();
         $this->setUpForEventStream($stream);
 
-        $version = 100;
-        $this->eventStore->countEventsFor($aggregateRoot->getAggregateRootId())->shouldBeCalled()->willReturn($version);
-
         $snapshotStore = $this->prophesize(SnapshotStoreInterface::class);
 
         $stream->each(function (DomainMessage $domainMessage) use ($snapshotStore, $aggregateRoot) {
@@ -92,7 +89,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
                 $aggregateRoot->getAggregateRootId(),
                 $domainMessage->getVersion()
             )->shouldBeCalled()->willReturn(false);
-            
+
             $snapshotStore->save(Argument::type(Snapshot::class))->shouldBeCalled();
         });
 
