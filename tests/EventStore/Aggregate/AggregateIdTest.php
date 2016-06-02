@@ -1,101 +1,51 @@
 <?php
 
-namespace HelloFresh\Tests\Engine\EventSourcing;
+namespace HelloFresh\Tests\Engine\EventStore\Aggregate;
 
 use HelloFresh\Engine\Domain\AggregateId;
-use HelloFresh\Engine\Domain\DomainMessage;
-use HelloFresh\Engine\Domain\EventStream;
-use HelloFresh\Engine\EventStore\EventStoreInterface;
-use HelloFresh\Tests\Engine\Mock\SomethingHappened;
+use HelloFresh\Engine\Domain\AggregateIdInterface;
 use Ramsey\Uuid\Uuid;
 
-abstract class AggregateIdTest extends \PHPUnit_Framework_TestCase
+class AggregateIdTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EventStoreInterface
-     */
-    protected $eventStore;
-
-    /**
      * @test
-     * @dataProvider idDataProvider
      */
-    public function it_creates_a_new_entry_when_id_is_new($id)
+    public function itShouldCreateAUuidFromConstructor()
     {
-        $domainEventStream = new EventStream([
-            $this->createDomainMessage($id, 0),
-            $this->createDomainMessage($id, 1),
-            $this->createDomainMessage($id, 2),
-            $this->createDomainMessage($id, 3),
-        ]);
-
-        $this->eventStore->append($domainEventStream);
-        $this->assertEquals($domainEventStream, $this->eventStore->getEventsFor($id));
+        $aggregateId = new AggregateId(Uuid::uuid4());
+        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
     }
 
     /**
      * @test
-     * @dataProvider idDataProvider
      */
-    public function it_appends_to_an_already_existing_stream($id)
+    public function itShouldCreateAUuidFromNamedConstructor()
     {
-        $dateTime = new \DateTimeImmutable("now");
-
-        $domainEventStream = new EventStream([
-            $this->createDomainMessage($id, 0, $dateTime),
-            $this->createDomainMessage($id, 1, $dateTime),
-            $this->createDomainMessage($id, 2, $dateTime),
-        ]);
-        $this->eventStore->append($domainEventStream);
-        $appendedEventStream = new EventStream([
-            $this->createDomainMessage($id, 3, $dateTime),
-            $this->createDomainMessage($id, 4, $dateTime),
-            $this->createDomainMessage($id, 5, $dateTime),
-        ]);
-        $this->eventStore->append($appendedEventStream);
-        $expected = new EventStream([
-            $this->createDomainMessage($id, 0, $dateTime),
-            $this->createDomainMessage($id, 1, $dateTime),
-            $this->createDomainMessage($id, 2, $dateTime),
-            $this->createDomainMessage($id, 3, $dateTime),
-            $this->createDomainMessage($id, 4, $dateTime),
-            $this->createDomainMessage($id, 5, $dateTime),
-        ]);
-        $this->assertEquals($expected, $this->eventStore->getEventsFor($id));
+        $aggregateId = AggregateId::generate();
+        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
     }
 
     /**
      * @test
-     * @dataProvider idDataProvider
-     * @expectedException \HelloFresh\Engine\EventStore\Exception\EventStreamNotFoundException
      */
-    public function it_throws_an_exception_when_requesting_the_stream_of_a_non_existing_aggregate($id)
+    public function itShouldCreateAUuidFromAString()
     {
-        $this->eventStore->getEventsFor($id);
+        $aggregateIdString = Uuid::uuid4();
+        $aggregateId = AggregateId::fromString($aggregateIdString);
+
+        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
     }
 
-    public function idDataProvider()
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     */
+    public function itShouldFailWhenCreatingAnIdFromInvalidString()
     {
-        return [
-            'Simple String' => [
-                'Yolntbyaac', //You only live nine times because you are a cat
-            ],
-            'Identitiy' => [
-                AggregateId::generate(),
-            ],
-            'UUID String' => [
-                Uuid::uuid4()->toString(), // test UUID
-            ],
-        ];
-    }
+        $aggregateIdString = 'invalidUuid';
+        $aggregateId = AggregateId::fromString($aggregateIdString);
 
-    protected function createDomainMessage($id, $version, $recordedOn = null)
-    {
-        return new DomainMessage(
-            $id,
-            $version,
-            new SomethingHappened(),
-            $recordedOn ? $recordedOn : new \DateTimeImmutable("now")
-        );
+        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
     }
 }

@@ -1,51 +1,60 @@
 <?php
 
-namespace HelloFresh\Tests\Engine\EventStore\Aggregate;
+namespace HelloFresh\Tests\Engine\Domain;
 
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
-use Ramsey\Uuid\Uuid;
+use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Tests\Engine\Mock\SomethingHappened;
 
-class AggregateIdTest extends \PHPUnit_Framework_TestCase
+class DomainMessageTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
+     * @dataProvider messageProvider
+     * @param AggregateIdInterface $aggregateId
+     * @param $version
+     * @param $payload
+     * @param \DateTimeImmutable $date
      */
-    public function itShouldCreateAUuidFromConstructor()
-    {
-        $aggregateId = new AggregateId(Uuid::uuid4());
-        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
+    public function itShouldCreateAUuidFromConstructor(
+        AggregateIdInterface $aggregateId,
+        $version,
+        $payload,
+        \DateTimeImmutable $date
+    ) {
+        $message = new DomainMessage($aggregateId, $version, $payload, $date);
+        $this->assertInstanceOf(DomainMessage::class, $message);
+        $this->assertEquals($aggregateId, $message->getId());
+        $this->assertEquals($version, $message->getVersion());
+        $this->assertEquals($payload, $message->getPayload());
+        $this->assertEquals($date, $message->getRecordedOn());
     }
 
     /**
      * @test
+     * @dataProvider messageProvider
+     * @param AggregateIdInterface $aggregateId
+     * @param $version
+     * @param $payload
+     * @param \DateTimeImmutable $date
      */
-    public function itShouldCreateAUuidFromNamedConstructor()
-    {
-        $aggregateId = AggregateId::generate();
-        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
+    public function itShouldCreateAUuidFromNamedConstructor(
+        AggregateIdInterface $aggregateId,
+        $version,
+        $payload,
+        \DateTimeImmutable $date
+    ) {
+        $message = DomainMessage::recordNow($aggregateId, $version, $payload);
+        $this->assertInstanceOf(DomainMessage::class, $message);
     }
 
-    /**
-     * @test
-     */
-    public function itShouldCreateAUuidFromAString()
+    public function messageProvider()
     {
-        $aggregateIdString = Uuid::uuid4();
-        $aggregateId = AggregateId::fromString($aggregateIdString);
-
-        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
-    }
-
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     */
-    public function itShouldFailWhenCreatingAnIdFromInvalidString()
-    {
-        $aggregateIdString = 'invalidUuid';
-        $aggregateId = AggregateId::fromString($aggregateIdString);
-
-        $this->assertInstanceOf(AggregateIdInterface::class, $aggregateId);
+        return [
+            [AggregateId::generate(), 1, new SomethingHappened(), new \DateTimeImmutable()],
+            [AggregateId::generate(), 100, new SomethingHappened(), new \DateTimeImmutable()],
+            [AggregateId::generate(), 9999999, new SomethingHappened(), new \DateTimeImmutable()]
+        ];
     }
 }
