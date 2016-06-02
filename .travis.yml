@@ -4,10 +4,15 @@ env:
     global:
         - REDIS_HOST=localhost
         - MONGO_HOST=localhost
+        - DB_NAME=events
+        - DB_USER=postgres
+        - DB_PASSWORD=fresh4you
+        - DB_HOST=localhost
 
 services:
   - redis-server
   - mongodb
+  - postgresql
 
 php:
   - 5.6
@@ -21,6 +26,7 @@ before_install:
   - pecl install mongodb
   - echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - psql -c 'create database events;' -U postgres
 
 install:
   - composer self-update

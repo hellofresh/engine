@@ -6,9 +6,11 @@ use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
 use HelloFresh\Engine\EventSourcing\AggregateRepository;
+use HelloFresh\Engine\EventStore\Adapter\DbalAdapter;
 use HelloFresh\Engine\EventStore\Adapter\MongoAdapter;
 use HelloFresh\Engine\EventStore\Adapter\MongoDbAdapter;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
+use HelloFresh\Engine\EventStore\Adapter\Schema\DbalSchema;
 use HelloFresh\Engine\EventStore\EventStore;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\RedisSnapshotAdapter;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStore;
@@ -30,6 +32,19 @@ use Predis\Client as RedisClient;
  */
 class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 {
+    private $connection;
+
+    protected function setUp()
+    {
+        $connection = $this->getDoctrineConnection();
+        DbalSchema::createSchema($connection);
+    }
+
+    protected function tearDown()
+    {
+        DbalSchema::dropSchema($this->connection);
+    }
+
     /**
      * @test
      * @dataProvider eventStoreProvider
@@ -60,13 +75,30 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
     public function eventStoreProvider()
     {
-        $host = getenv('REDIS_HOST');
-        $port = getenv('REDIS_PORT') ?: "6379";
-
-        $mongoHost = getenv('MONGO_HOST');
-        $mongoPort = getenv('MONGO_PORT') ?: "27017";
-
         //Setup serializer
+        $serializer = $this->configureSerializer();
+        $redis = $this->configureRedis();
+
+        if (version_compare(PHP_VERSION, '7.0', '>=')) {
+            $mongodb = $this->configureMongoDB();
+            $mongodbAdapter = new MongoDbAdapter($mongodb, 'chassis', $serializer);
+        } else {
+            $mongodb = $this->configureMongo();
+            $mongodbAdapter = new MongoAdapter($mongodb, 'chassis', $serializer);
+        }
+
+        return [
+            [new RedisAdapter($redis, $serializer), new RedisSnapshotAdapter($redis, $serializer)],
+            [$mongodbAdapter, new RedisSnapshotAdapter($redis, $serializer)],
+            [
+                new DbalAdapter($this->getDoctrineConnection(), $serializer, DbalSchema::TABLE_NAME),
+                new RedisSnapshotAdapter($redis, $serializer)
+            ]
+        ];
+    }
+
+    private function configureSerializer()
+    {
         $jmsSerializer = SerializerBuilder::create()
             ->setMetadataDirs(['' => realpath(__DIR__ . '/Mock/Config')])
             ->configureHandlers(function (HandlerRegistry $registry) {
@@ -75,21 +107,50 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
             })
             ->addDefaultHandlers()
             ->build();
-        $serializer = new JmsSerializerAdapter($jmsSerializer);
 
-        $redis = new RedisClient("tcp://$host:$port");
+        return new JmsSerializerAdapter($jmsSerializer);
+    }
 
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            $mongodb = new MongoClient("mongodb://$mongoHost:$mongoPort");
-            $mongodbAdapter = new MongoDbAdapter($mongodb, 'chassis', $serializer);
-        } else {
-            $mongodb = new \MongoClient("mongodb://$mongoHost:$mongoPort");
-            $mongodbAdapter = new MongoAdapter($mongodb, 'chassis', $serializer);
+    private function configureMongoDB()
+    {
+        $host = getenv('MONGO_HOST');
+        $port = getenv('MONGO_PORT') ?: "27017";
+
+        return new MongoClient("mongodb://$host:$port");
+    }
+
+    private function configureMongo()
+    {
+        $host = getenv('MONGO_HOST');
+        $port = getenv('MONGO_PORT') ?: "27017";
+
+        return new \MongoClient("mongodb://$host:$port");
+    }
+
+    private function configureRedis()
+    {
+        $host = getenv('REDIS_HOST');
+        $port = getenv('REDIS_PORT') ?: "6379";
+
+        return new RedisClient("tcp://$host:$port");
+    }
+
+    private function getDoctrineConnection()
+    {
+        if ($this->connection) {
+            return $this->connection;
         }
 
-        return [
-            [new RedisAdapter($redis, $serializer), new RedisSnapshotAdapter($redis, $serializer)],
-            [$mongodbAdapter, new RedisSnapshotAdapter($redis, $serializer)]
+        $connectionParams = [
+            'dbname' => getenv('DB_NAME'),
+            'user' => getenv('DB_USER'),
+            'password' => getenv('DB_PASSWORD'),
+            'host' => getenv('DB_HOST'),
+            'driver' => 'pdo_pgsql',
         ];
+
+        $this->connection = \Doctrine\DBAL\DriverManager::getConnection($connectionParams);
+
+        return $this->connection;
     }
 }

@@ -3,7 +3,6 @@
 namespace HelloFresh\Engine\EventStore\Adapter;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\Serializer\SerializerInterface;
@@ -11,8 +10,6 @@ use HelloFresh\Engine\Serializer\SerializerInterface;
 class DbalAdapter implements EventStoreAdapterInterface
 {
     use EventProcessorTrait;
-
-    const TABLE_NAME = 'events';
 
     /**
      * @var Connection
@@ -22,25 +19,26 @@ class DbalAdapter implements EventStoreAdapterInterface
     /**
      * @var string
      */
-    private $dbName;
+    private $tableName;
 
-
-    public function __construct(Connection $connection, SerializerInterface $serializer)
+    public function __construct(Connection $connection, SerializerInterface $serializer, $tableName)
     {
         $this->connection = $connection;
         $this->serializer = $serializer;
+        $this->tableName = $tableName;
     }
 
     public function save(DomainMessage $event)
     {
         $data = $this->createEventData($event);
-        $this->connection->insert(static::TABLE_NAME, $data);
+        $this->connection->insert($this->tableName, $data);
     }
 
     public function getEventsFor($id)
     {
         $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->where('e.aggregate_id = :id')
+        $queryBuilder->where('aggregate_id = :id')
+            ->addOrderBy('version')
             ->setParameter('id', (string)$id);
 
         $serializedEvents = $queryBuilder->execute();
@@ -51,8 +49,9 @@ class DbalAdapter implements EventStoreAdapterInterface
     public function fromVersion(AggregateIdInterface $aggregateId, $version)
     {
         $queryBuilder = $this->getQueryBuilder();
-        $queryBuilder->where('e.aggregate_id = :id')
-            ->andWhere('e.version = :version')
+        $queryBuilder->where('aggregate_id = :id')
+            ->andWhere('version >= :version')
+            ->addOrderBy('version')
             ->setParameter('id', (string)$aggregateId)
             ->setParameter('version', $version);
 
@@ -65,10 +64,10 @@ class DbalAdapter implements EventStoreAdapterInterface
     {
         $queryBuilder = $this->getQueryBuilder()
             ->select('count(aggregate_id)')
-            ->where('e.aggregate_id = :id')
+            ->where('aggregate_id = :id')
             ->setParameter('id', (string)$aggregateId);
 
-        return $queryBuilder->execute();
+        return $queryBuilder->execute()->fetch()["count"];
     }
 
     private function getQueryBuilder()
@@ -77,38 +76,6 @@ class DbalAdapter implements EventStoreAdapterInterface
 
         return $queryBuilder
             ->select('*')
-            ->from(static::TABLE_NAME, 'e')
-            ->orderBy('version', 'ASC');
-    }
-
-    /**
-     * @param Connection $connection
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public static function createSchema(Connection $connection)
-    {
-        $schema = new Schema();
-        static::addToSchema($schema, static::TABLE_NAME);
-        $sqls = $schema->toSql($connection->getDatabasePlatform());
-
-        foreach ($sqls as $sql) {
-            $connection->executeQuery($sql);
-        }
-    }
-
-    /**
-     * @param Schema $schema
-     * @param string $table
-     */
-    public static function addToSchema(Schema $schema, $table)
-    {
-        $table = $schema->createTable($table);
-        $table->addColumn('aggregate_id', 'string', ['length' => 50]);
-        $table->addColumn('version', 'integer');
-        $table->addColumn('type', 'string', ['length' => 100]);
-        $table->addColumn('payload', 'text');
-        $table->addColumn('recorded_on', 'string', ['length' => 50]);
-
-        $table->setPrimaryKey(['event_id']);
+            ->from($this->tableName);
     }
 }
