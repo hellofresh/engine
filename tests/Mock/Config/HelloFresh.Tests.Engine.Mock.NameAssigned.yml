@@ -1,0 +1,9 @@
+---
+HelloFresh\Tests\Engine\Mock\NameAssigned:
+  properties:
+    aggregateId:
+      type: HelloFresh\Engine\Domain\AggregateId
+    name:
+      type: string
+    occurredOn:
+      type: DateTime

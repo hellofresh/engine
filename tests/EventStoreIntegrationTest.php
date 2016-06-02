@@ -58,7 +58,7 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $eventStore = new EventStore($eventStoreAdapter);
         $snapshotStore = new SnapshotStore($snapshotAdapter);
-        $snapshotter = new Snapshotter($snapshotStore, new CountSnapshotStrategy($eventStore));
+        $snapshotter = new Snapshotter($snapshotStore, new CountSnapshotStrategy($eventStore, 5));
 
         $aggregateRepo = new AggregateRepository($eventStore, $eventBus, $snapshotter);
 
@@ -69,8 +69,11 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $command = new AssignNameCommand($aggregateRoot->getAggregateRootId(), 'test2');
         $commandBus->execute($command);
+        $commandBus->execute($command);
+        $commandBus->execute($command);
+        $commandBus->execute($command);
 
-        $this->assertEquals(3, $eventStore->countEventsFor($aggregateRoot->getAggregateRootId()));
+        $this->assertEquals(6, $eventStore->countEventsFor($aggregateRoot->getAggregateRootId()));
     }
 
     public function eventStoreProvider()

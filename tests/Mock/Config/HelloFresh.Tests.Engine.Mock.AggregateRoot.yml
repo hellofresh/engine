@@ -1,0 +1,13 @@
+---
+HelloFresh\Tests\Engine\Mock\AggregateRoot:
+  properties:
+    aggregateId:
+      type: HelloFresh\Engine\Domain\AggregateId
+    name:
+      type: string
+    uncommittedEvents:
+      exposed: false
+      type: array
+    version:
+      exposed: false
+      type: integer
