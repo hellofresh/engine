@@ -7,11 +7,13 @@ use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
 use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\Adapter\DbalAdapter;
+use HelloFresh\Engine\EventStore\Adapter\InMemoryAdapter;
 use HelloFresh\Engine\EventStore\Adapter\MongoAdapter;
 use HelloFresh\Engine\EventStore\Adapter\MongoDbAdapter;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
 use HelloFresh\Engine\EventStore\Adapter\Schema\DbalSchema;
 use HelloFresh\Engine\EventStore\EventStore;
+use HelloFresh\Engine\EventStore\Snapshot\Adapter\InMemorySnapshotAdapter;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\RedisSnapshotAdapter;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStore;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
@@ -91,6 +93,7 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         }
 
         return [
+            [new InMemoryAdapter(), new InMemorySnapshotAdapter()],
             [new RedisAdapter($redis, $serializer), new RedisSnapshotAdapter($redis, $serializer)],
             [$mongodbAdapter, new RedisSnapshotAdapter($redis, $serializer)],
             [
