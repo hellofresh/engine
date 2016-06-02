@@ -6,7 +6,7 @@ env:
         - MONGO_HOST=localhost
         - DB_NAME=events
         - DB_USER=postgres
-        - DB_PASSWORD=fresh4you
+        - DB_PASSWORD=
         - DB_HOST=localhost
 
 services:
