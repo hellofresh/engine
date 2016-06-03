@@ -13,8 +13,10 @@ use HelloFresh\Engine\EventStore\Adapter\MongoDbAdapter;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
 use HelloFresh\Engine\EventStore\Adapter\Schema\DbalSchema;
 use HelloFresh\Engine\EventStore\EventStore;
+use HelloFresh\Engine\EventStore\Snapshot\Adapter\DbalSnapshotAdapter;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\InMemorySnapshotAdapter;
 use HelloFresh\Engine\EventStore\Snapshot\Adapter\RedisSnapshotAdapter;
+use HelloFresh\Engine\EventStore\Snapshot\Adapter\Schema\SnapshotSchema;
 use HelloFresh\Engine\EventStore\Snapshot\SnapshotStore;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshotter;
 use HelloFresh\Engine\EventStore\Snapshot\Strategy\CountSnapshotStrategy;
@@ -40,11 +42,13 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
     {
         $connection = $this->getDoctrineConnection();
         DbalSchema::createSchema($connection);
+        SnapshotSchema::createSchema($connection);
     }
 
     protected function tearDown()
     {
         DbalSchema::dropSchema($this->connection);
+        SnapshotSchema::dropSchema($this->connection);
     }
 
     /**
@@ -98,7 +102,7 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
             [$mongodbAdapter, new RedisSnapshotAdapter($redis, $serializer)],
             [
                 new DbalAdapter($this->getDoctrineConnection(), $serializer, DbalSchema::TABLE_NAME),
-                new RedisSnapshotAdapter($redis, $serializer)
+                new DbalSnapshotAdapter($this->getDoctrineConnection(), $serializer, DbalSchema::TABLE_NAME)
             ]
         ];
     }

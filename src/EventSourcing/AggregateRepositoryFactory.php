@@ -47,7 +47,10 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
                 ]
             ]
         ]);
-        $this->config->concat($config);
+
+        if ($config) {
+            $this->config->concat($config);
+        }
     }
 
     public function build()
@@ -93,8 +96,6 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
         $adapterName = $config->get('name');
         $arguments = $config->tryGet('arguments', []);
 
-        $adapter = new $adapterName(...$arguments);
-
-        return new SnapshotStore($adapter);
+        return new $adapterName(...$arguments);
     }
 }
