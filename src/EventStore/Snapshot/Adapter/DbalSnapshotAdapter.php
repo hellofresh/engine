@@ -4,7 +4,6 @@ namespace HelloFresh\Engine\EventStore\Snapshot\Adapter;
 
 use Doctrine\DBAL\Connection;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
-use HelloFresh\Engine\EventStore\Adapter\SnapshotProcessorTrait;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
 use HelloFresh\Engine\Serializer\SerializerInterface;
 

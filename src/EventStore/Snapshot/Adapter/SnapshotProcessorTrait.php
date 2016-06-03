@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Engine\EventStore\Adapter;
+namespace HelloFresh\Engine\EventStore\Snapshot\Adapter;
 
 use HelloFresh\Engine\Domain\AggregateRootInterface;
 use HelloFresh\Engine\EventStore\Exception\EventStreamNotFoundException;
