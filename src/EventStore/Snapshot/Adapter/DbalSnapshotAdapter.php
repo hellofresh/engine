@@ -36,9 +36,12 @@ class DbalSnapshotAdapter implements SnapshotStoreAdapterInterface
         $queryBuilder = $this->getQueryBuilder()
             ->where('aggregate_id = :id')
             ->addOrderBy('version')
+            ->setMaxResults(1)
             ->setParameter('id', (string)$id);
 
-        return $this->processSnapshot($queryBuilder->execute());
+        $snapshot = $queryBuilder->execute()->fetch();
+
+        return $this->processSnapshot($snapshot);
     }
 
     /**
@@ -58,9 +61,11 @@ class DbalSnapshotAdapter implements SnapshotStoreAdapterInterface
     {
         $queryBuilder = $this->getQueryBuilder()
             ->where('aggregate_id = :id')
+            ->setMaxResults(1)
             ->addOrderBy('version')
             ->setParameter('id', (string)$id);
-        $metadata = $queryBuilder->execute();
+
+        $metadata = $queryBuilder->execute()->fetch();
 
         if (empty($metadata)) {
             return false;

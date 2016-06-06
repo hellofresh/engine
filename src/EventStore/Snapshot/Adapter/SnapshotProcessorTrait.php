@@ -2,8 +2,8 @@
 
 namespace HelloFresh\Engine\EventStore\Snapshot\Adapter;
 
+use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\AggregateRootInterface;
-use HelloFresh\Engine\EventStore\Exception\EventStreamNotFoundException;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
 use HelloFresh\Engine\Serializer\SerializerInterface;
 
@@ -27,8 +27,8 @@ trait SnapshotProcessorTrait
 
     private function processSnapshot($metadata)
     {
-        if (!$metadata) {
-            throw new EventStreamNotFoundException('The snapshot doesn\'t exists');
+        if (false === $metadata) {
+            return null;
         }
 
         /** @var AggregateRootInterface $aggregate */
@@ -39,7 +39,7 @@ trait SnapshotProcessorTrait
         );
 
         return new Snapshot(
-            $metadata['aggregate_id'],
+            AggregateId::fromString($metadata['aggregate_id']),
             $aggregate,
             $metadata['version'],
             new \DateTimeImmutable("@" . $metadata['created_at'])

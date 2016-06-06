@@ -102,7 +102,7 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
             [$mongodbAdapter, new RedisSnapshotAdapter($redis, $serializer)],
             [
                 new DbalAdapter($this->getDoctrineConnection(), $serializer, DbalSchema::TABLE_NAME),
-                new DbalSnapshotAdapter($this->getDoctrineConnection(), $serializer, DbalSchema::TABLE_NAME)
+                new DbalSnapshotAdapter($this->getDoctrineConnection(), $serializer, SnapshotSchema::TABLE_NAME)
             ]
         ];
     }
