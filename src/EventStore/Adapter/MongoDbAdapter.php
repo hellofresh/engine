@@ -12,7 +12,6 @@ class MongoDbAdapter implements EventStoreAdapterInterface
 {
     use EventProcessorTrait;
 
-    const COLLECTION_NAME = 'events';
     /**
      * @var Client
      */
@@ -28,11 +27,23 @@ class MongoDbAdapter implements EventStoreAdapterInterface
      */
     private $serializer;
 
-    public function __construct(Client $client, $dbName, SerializerInterface $serializer)
-    {
+    /**
+     * @var string
+     */
+    private $collectionName;
+
+    public function __construct(
+        Client $client,
+        SerializerInterface $serializer,
+        $dbName,
+        $collectionName = 'events'
+    ) {
         $this->client = $client;
-        $this->dbName = $dbName;
         $this->serializer = $serializer;
+        $this->dbName = $dbName;
+        $this->collectionName = $collectionName;
+
+        $this->createIndexes();
     }
 
     public function save(DomainMessage $event)
@@ -98,6 +109,23 @@ class MongoDbAdapter implements EventStoreAdapterInterface
      */
     private function getCollection()
     {
-        return $this->client->selectCollection($this->dbName, static::COLLECTION_NAME);
+        return $this->client->selectCollection($this->dbName, $this->collectionName);
+    }
+
+    /**
+     * @return void
+     */
+    private function createIndexes()
+    {
+        $collection = $this->getCollection();
+        $collection->createIndex(
+            [
+                'aggregate_id' => 1,
+                'version' => 1,
+            ],
+            [
+                'unique' => true,
+            ]
+        );
     }
 }

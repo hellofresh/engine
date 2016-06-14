@@ -12,7 +12,7 @@ trait AggregateRootTrait
      * @var array
      */
     private $uncommittedEvents = [];
-    private $version = 0;
+    private $version = -1;
 
     /**
      * @param EventStream $historyEvents
@@ -44,8 +44,8 @@ trait AggregateRootTrait
     public function replay(EventStream $historyEvents)
     {
         $historyEvents->each(function (DomainMessage $pastEvent) {
+            $this->version++;
             $this->apply($pastEvent->getPayload());
-            $this->version = $pastEvent->getVersion();
         });
     }
 
@@ -67,7 +67,6 @@ trait AggregateRootTrait
 
     protected function recordThat(DomainEventInterface $event)
     {
-        $this->nextVersion();
         $this->apply($event);
         $this->record($event);
 
@@ -89,15 +88,11 @@ trait AggregateRootTrait
 
     private function record(DomainEventInterface $event)
     {
+        $this->version++;
         $this->uncommittedEvents[] = DomainMessage::recordNow(
             $this->getAggregateRootId(),
             $this->version,
             $event
         );
-    }
-
-    private function nextVersion()
-    {
-        return $this->version + 1;
     }
 }

@@ -90,10 +90,10 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
         if (version_compare(PHP_VERSION, '7.0', '>=')) {
             $mongodb = $this->configureMongoDB();
-            $mongodbAdapter = new MongoDbAdapter($mongodb, 'chassis', $serializer);
+            $mongodbAdapter = new MongoDbAdapter($mongodb, $serializer, 'chassis');
         } else {
             $mongodb = $this->configureMongo();
-            $mongodbAdapter = new MongoAdapter($mongodb, 'chassis', $serializer);
+            $mongodbAdapter = new MongoAdapter($mongodb, $serializer, 'chassis');
         }
 
         return [

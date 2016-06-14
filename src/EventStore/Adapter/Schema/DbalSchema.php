@@ -65,6 +65,8 @@ class DbalSchema
         if (!$table->hasColumn('recorded_on')) {
             $table->addColumn('recorded_on', 'string', ['length' => 50]);
         }
+
+        $table->addUniqueIndex(['aggregate_id', 'version']);
     }
 
     /**
