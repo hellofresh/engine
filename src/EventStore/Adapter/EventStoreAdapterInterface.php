@@ -4,14 +4,15 @@ namespace HelloFresh\Engine\EventStore\Adapter;
 
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Engine\Domain\StreamName;
 
 interface EventStoreAdapterInterface
 {
-    public function save(DomainMessage $events);
+    public function save(StreamName $streamName, DomainMessage $events);
 
-    public function getEventsFor($id);
+    public function getEventsFor(StreamName $streamName, $id);
 
-    public function fromVersion(AggregateIdInterface $aggregateId, $version);
+    public function fromVersion(StreamName $streamName, AggregateIdInterface $aggregateId, $version);
 
-    public function countEventsFor(AggregateIdInterface $aggregateId);
+    public function countEventsFor(StreamName $streamName, AggregateIdInterface $aggregateId);
 }

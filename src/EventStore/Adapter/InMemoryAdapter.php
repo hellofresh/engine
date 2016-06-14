@@ -8,6 +8,7 @@ use Collections\MapInterface;
 use Collections\VectorInterface;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventStore\Exception\EventStreamNotFoundException;
 
 class InMemoryAdapter implements EventStoreAdapterInterface
@@ -22,32 +23,45 @@ class InMemoryAdapter implements EventStoreAdapterInterface
         $this->events = new Dictionary();
     }
 
-    public function save(DomainMessage $event)
+    public function save(StreamName $streamName, DomainMessage $event)
     {
         $id = (string)$event->getId();
+        $name = (string)$streamName;
+        $events = $this->events->tryGet($name);
 
-        if (!$this->events->containsKey($id)) {
-            $this->events->add($id, new ArrayList());
+        if (!$events) {
+            $events = new Dictionary();
+            $this->events->add($name, $events);
         }
 
-        $this->events->get($id)->add($event);
+        if (!$events->containsKey($id)) {
+            $events->add($id, new ArrayList());
+        }
+
+        $events->get($id)->add($event);
     }
 
-    public function getEventsFor($id)
+    public function getEventsFor(StreamName $streamName, $id)
     {
         $id = (string)$id;
+        $name = (string)$streamName;
+        /** @var MapInterface $events */
+        $events = $this->events->get($name);
 
-        if (!$this->events->containsKey($id)) {
+        if (!$events->containsKey($id)) {
             throw new EventStreamNotFoundException();
         }
 
-        return $this->events->get($id);
+        return $events->get($id);
     }
 
-    public function fromVersion(AggregateIdInterface $aggregateId, $version)
+    public function fromVersion(StreamName $streamName, AggregateIdInterface $aggregateId, $version)
     {
+        $name = (string)$streamName;
+        /** @var MapInterface $events */
+        $events = $this->events->get($name);
         /** @var VectorInterface $aggregateEvents */
-        $aggregateEvents = $this->events->get((string)$aggregateId);
+        $aggregateEvents = $events->get((string)$aggregateId);
 
         return $aggregateEvents->filter(function (DomainMessage $message) use ($aggregateId) {
             return $message->getId() === $aggregateId;
@@ -56,10 +70,13 @@ class InMemoryAdapter implements EventStoreAdapterInterface
         });
     }
 
-    public function countEventsFor(AggregateIdInterface $aggregateId)
+    public function countEventsFor(StreamName $streamName, AggregateIdInterface $aggregateId)
     {
+        $name = (string)$streamName;
+        /** @var MapInterface $events */
+        $events = $this->events->get($name);
         /** @var MapInterface $stream */
-        $stream = $this->events->get((string)$aggregateId);
+        $stream = $events->get((string)$aggregateId);
 
         return $stream->count();
     }

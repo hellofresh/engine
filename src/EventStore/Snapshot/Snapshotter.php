@@ -5,6 +5,7 @@ namespace HelloFresh\Engine\EventStore\Snapshot;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\AggregateRootInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventStore\Snapshot\Strategy\SnapshotStrategyInterface;
 
 class Snapshotter
@@ -30,11 +31,11 @@ class Snapshotter
         $this->strategy = $strategy;
     }
 
-    public function take(AggregateRootInterface $aggregate, DomainMessage $message)
+    public function take(StreamName $streamName, AggregateRootInterface $aggregate, DomainMessage $message)
     {
         $id = $aggregate->getAggregateRootId();
 
-        if (!$this->strategy->isFulfilled($aggregate)) {
+        if (!$this->strategy->isFulfilled($streamName, $aggregate)) {
             return false;
         }
 

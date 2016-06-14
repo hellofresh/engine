@@ -4,6 +4,7 @@ namespace HelloFresh\Engine\EventStore\Adapter;
 
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\Serializer\SerializerInterface;
 
 class MongoAdapter implements EventStoreAdapterInterface
@@ -20,43 +21,34 @@ class MongoAdapter implements EventStoreAdapterInterface
      */
     private $dbName;
 
-    /**
-     * @var string
-     */
-    private $collectionName;
-
     public function __construct(
         \MongoClient $client,
         SerializerInterface $serializer,
-        $dbName,
-        $collectionName = 'events'
+        $dbName
     ) {
         $this->client = $client;
-        $this->dbName = $dbName;
-        $this->collectionName = $collectionName;
         $this->serializer = $serializer;
-
-        $this->createIndexes();
+        $this->dbName = $dbName;
     }
 
-    public function save(DomainMessage $event)
+    public function save(StreamName $streamName, DomainMessage $event)
     {
+        $this->createIndexes($streamName);
         $data = $this->createEventData($event);
-
-        $this->getCollection()->insert($data);
+        $this->getCollection($streamName)->insert($data);
     }
 
-    public function getEventsFor($id)
+    public function getEventsFor(StreamName $streamName, $id)
     {
         $query['aggregate_id'] = (string)$id;
 
-        $collection = $this->getCollection();
+        $collection = $this->getCollection($streamName);
         $serializedEvents = $collection->find($query)->sort(['version' => \MongoCollection::ASCENDING]);
 
         return $this->processEvents($serializedEvents);
     }
 
-    public function fromVersion(AggregateIdInterface $aggregateId, $version)
+    public function fromVersion(StreamName $streamName, AggregateIdInterface $aggregateId, $version)
     {
         $query['aggregate_id'] = (string)$aggregateId;
 
@@ -64,16 +56,16 @@ class MongoAdapter implements EventStoreAdapterInterface
             $query['version'] = ['$gte' => $version];
         }
 
-        $collection = $this->getCollection();
+        $collection = $this->getCollection($streamName);
         $serializedEvents = $collection->find($query)->sort(['version' => \MongoCollection::ASCENDING]);;
 
         return $this->processEvents($serializedEvents);
     }
 
-    public function countEventsFor(AggregateIdInterface $aggregateId)
+    public function countEventsFor(StreamName $streamName, AggregateIdInterface $aggregateId)
     {
         $query['aggregate_id'] = (string)$aggregateId;
-        $collection = $this->getCollection();
+        $collection = $this->getCollection($streamName);
 
         return $collection->count($query);
     }
@@ -81,19 +73,20 @@ class MongoAdapter implements EventStoreAdapterInterface
     /**
      * Get mongo db stream collection
      *
+     * @param StreamName $streamName
      * @return \MongoCollection
      */
-    private function getCollection()
+    private function getCollection(StreamName $streamName)
     {
-        return $this->client->selectCollection($this->dbName, $this->collectionName);
+        return $this->client->selectCollection($this->dbName, (string)$streamName);
     }
 
     /**
-     * @return void
+     * @param StreamName $streamName
      */
-    private function createIndexes()
+    private function createIndexes(StreamName $streamName)
     {
-        $collection = $this->getCollection();
+        $collection = $this->getCollection($streamName);
         $collection->createIndex(
             [
                 'aggregate_id' => 1,

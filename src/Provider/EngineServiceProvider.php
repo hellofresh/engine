@@ -128,37 +128,34 @@ class EngineServiceProvider implements ServiceProviderInterface
 
         $pimple["$this->prefix.event_store.adapter.dbal"] = function (Container $c) {
             $connection = $c["$this->prefix.config"]['event_store']['adapters']['dbal']['connection'];
-            $tableName = $c["$this->prefix.config"]['event_store']['adapters']['dbal']['table_name'];
 
             if (!isset($c[$connection])) {
                 throw new \InvalidArgumentException('Invalid event store  doctrine connection provided');
             }
 
-            return new DbalAdapter($c[$connection], $c["$this->prefix.serializer"], $tableName);
+            return new DbalAdapter($c[$connection], $c["$this->prefix.serializer"]);
         };
 
         $pimple["$this->prefix.event_store.adapter.mongo"] = function (Container $c) {
             $mongoClient = $c["$this->prefix.config"]['event_store']['adapters']['mongo']['client'];
             $dbName = $c["$this->prefix.config"]['event_store']['adapters']['mongo']['db_name'];
-            $collectionName = $c["$this->prefix.config"]['event_store']['adapters']['mongo']['collection_name'];
 
             if (!isset($c[$mongoClient])) {
                 throw new \InvalidArgumentException('Invalid event store mongo client provided');
             }
 
-            return new MongoAdapter($c[$mongoClient], $c["$this->prefix.serializer"], $dbName, $collectionName);
+            return new MongoAdapter($c[$mongoClient], $c["$this->prefix.serializer"], $dbName);
         };
 
         $pimple["$this->prefix.event_store.adapter.mongodb"] = function (Container $c) {
             $mongodbClient = $c["$this->prefix.config"]['event_store']['adapters']['mongodb']['client'];
             $dbName = $c["$this->prefix.config"]['event_store']['adapters']['mongodb']['db_name'];
-            $collectionName = $c["$this->prefix.config"]['event_store']['adapters']['mongodb']['collection_name'];
 
             if (!isset($c[$mongodbClient])) {
                 throw new \InvalidArgumentException('Invalid event store mongodb client provided');
             }
 
-            return new MongoDbAdapter($c[$mongodbClient], $c["$this->prefix.serializer"], $dbName, $collectionName);
+            return new MongoDbAdapter($c[$mongodbClient], $c["$this->prefix.serializer"], $dbName);
         };
 
         return function (Container $c) {

@@ -5,6 +5,7 @@ namespace HelloFresh\Engine\EventStore\Adapter;
 use Doctrine\DBAL\Connection;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\Serializer\SerializerInterface;
 
 class DbalAdapter implements EventStoreAdapterInterface
@@ -16,27 +17,21 @@ class DbalAdapter implements EventStoreAdapterInterface
      */
     private $connection;
 
-    /**
-     * @var string
-     */
-    private $tableName;
-
-    public function __construct(Connection $connection, SerializerInterface $serializer, $tableName)
+    public function __construct(Connection $connection, SerializerInterface $serializer)
     {
         $this->connection = $connection;
         $this->serializer = $serializer;
-        $this->tableName = $tableName;
     }
 
-    public function save(DomainMessage $event)
+    public function save(StreamName $streamName, DomainMessage $event)
     {
         $data = $this->createEventData($event);
-        $this->connection->insert($this->tableName, $data);
+        $this->connection->insert($streamName, $data);
     }
 
-    public function getEventsFor($id)
+    public function getEventsFor(StreamName $streamName, $id)
     {
-        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder = $this->getQueryBuilder($streamName);
         $queryBuilder->where('aggregate_id = :id')
             ->addOrderBy('version')
             ->setParameter('id', (string)$id);
@@ -46,9 +41,9 @@ class DbalAdapter implements EventStoreAdapterInterface
         return $this->processEvents($serializedEvents);
     }
 
-    public function fromVersion(AggregateIdInterface $aggregateId, $version)
+    public function fromVersion(StreamName $streamName, AggregateIdInterface $aggregateId, $version)
     {
-        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder = $this->getQueryBuilder($streamName);
         $queryBuilder->where('aggregate_id = :id')
             ->andWhere('version >= :version')
             ->addOrderBy('version')
@@ -60,9 +55,9 @@ class DbalAdapter implements EventStoreAdapterInterface
         return $this->processEvents($serializedEvents);
     }
 
-    public function countEventsFor(AggregateIdInterface $aggregateId)
+    public function countEventsFor(StreamName $streamName, AggregateIdInterface $aggregateId)
     {
-        $queryBuilder = $this->getQueryBuilder()
+        $queryBuilder = $this->getQueryBuilder($streamName)
             ->select('count(aggregate_id)')
             ->where('aggregate_id = :id')
             ->setParameter('id', (string)$aggregateId);
@@ -70,12 +65,12 @@ class DbalAdapter implements EventStoreAdapterInterface
         return $queryBuilder->execute()->fetch()["count"];
     }
 
-    private function getQueryBuilder()
+    private function getQueryBuilder(StreamName $streamName)
     {
         $queryBuilder = $this->connection->createQueryBuilder();
 
         return $queryBuilder
             ->select('*')
-            ->from($this->tableName);
+            ->from((string)$streamName);
     }
 }
