@@ -38,7 +38,7 @@ class RedisAdapter implements EventStoreAdapterInterface
             throw new EventStreamNotFoundException($id);
         }
 
-        $serializedEvents = $this->redis->lrange('events:' . $id, 0, -1);
+        $serializedEvents = $this->redis->lrange($this->getNamespaceKey($streamName, $id), 0, -1);
 
         return $this->processEvents($serializedEvents);
     }
@@ -49,7 +49,7 @@ class RedisAdapter implements EventStoreAdapterInterface
             throw new EventStreamNotFoundException($aggregateId);
         }
 
-        $serializedEvents = $this->redis->lrange('events:' . $aggregateId, 0, $version);
+        $serializedEvents = $this->redis->lrange($this->getNamespaceKey($streamName, $aggregateId), 0, $version);
 
         return $this->processEvents($serializedEvents);
     }
