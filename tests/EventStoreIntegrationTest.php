@@ -4,6 +4,7 @@ namespace HelloFresh\Tests;
 
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Engine\Domain\AggregateId;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
 use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\Adapter\DbalAdapter;
@@ -79,7 +80,8 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
         $commandBus->execute($command);
         $commandBus->execute($command);
 
-        $this->assertEquals(6, $eventStore->countEventsFor($aggregateRoot->getAggregateRootId()));
+        $this->assertEquals(6,
+            $eventStore->countEventsFor(new StreamName('event_stream'), $aggregateRoot->getAggregateRootId()));
     }
 
     public function eventStoreProvider()

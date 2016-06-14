@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 class DbalSchema
 {
-    const TABLE_NAME = 'events';
+    const TABLE_NAME = 'event_stream';
 
     /**
      * @param Connection $connection
