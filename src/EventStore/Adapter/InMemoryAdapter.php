@@ -46,7 +46,11 @@ class InMemoryAdapter implements EventStoreAdapterInterface
         $id = (string)$id;
         $name = (string)$streamName;
         /** @var MapInterface $events */
-        $events = $this->events->get($name);
+        try {
+            $events = $this->events->get($name);
+        } catch (\OutOfBoundsException $e) {
+            throw new EventStreamNotFoundException("Stream $name not found", $e->getCode(), $e);
+        }
 
         if (!$events->containsKey($id)) {
             throw new EventStreamNotFoundException();

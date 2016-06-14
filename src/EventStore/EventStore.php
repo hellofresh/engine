@@ -5,6 +5,7 @@ namespace HelloFresh\Engine\EventStore;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\Domain\EventStream;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventStore\Adapter\EventStoreAdapterInterface;
 
 class EventStore implements EventStoreInterface
@@ -25,23 +26,28 @@ class EventStore implements EventStoreInterface
 
     public function append(EventStream $events)
     {
-        $events->each(function (DomainMessage $event) {
-            $this->adapter->save($event);
+        $streamName = $events->getName();
+        $events->each(function (DomainMessage $event) use ($streamName) {
+            $this->adapter->save($streamName, $event);
         });
     }
 
-    public function getEventsFor($id)
+    public function getEventsFor(StreamName $streamName, $id)
     {
-        return new EventStream($this->adapter->getEventsFor($id));
+        $stream = $this->adapter->getEventsFor($streamName, $id);
+
+        return new EventStream($streamName, $stream);
     }
 
-    public function fromVersion(AggregateIdInterface $aggregateId, $version)
+    public function fromVersion(StreamName $streamName, AggregateIdInterface $aggregateId, $version)
     {
-        return new EventStream($this->adapter->fromVersion($aggregateId, $version));
+        $stream = $this->adapter->fromVersion($streamName, $aggregateId, $version);
+
+        return new EventStream($streamName, $stream);
     }
 
-    public function countEventsFor(AggregateIdInterface $aggregateId)
+    public function countEventsFor(StreamName $streamName, AggregateIdInterface $aggregateId)
     {
-        return $this->adapter->countEventsFor($aggregateId);
+        return $this->adapter->countEventsFor($streamName, $aggregateId);
     }
 }

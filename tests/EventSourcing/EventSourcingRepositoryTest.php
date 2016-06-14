@@ -5,6 +5,7 @@ namespace HelloFresh\Tests\Engine\EventSourcing;
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\Domain\EventStream;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventBus\EventBusInterface;
 use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\EventStoreInterface;
@@ -61,7 +62,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $snapshotStore = $this->prophesize(SnapshotStoreInterface::class);
 
         $strategy = $this->prophesize(SnapshotStrategyInterface::class);
-        $strategy->isFulfilled($aggregateRoot)->shouldBeCalled()->willReturn(true);
+        $strategy->isFulfilled(new StreamName('event_stream'), $aggregateRoot)->shouldBeCalled()->willReturn(true);
         $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
 
         $repo = new AggregateRepository(
@@ -94,7 +95,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         });
 
         $strategy = $this->prophesize(SnapshotStrategyInterface::class);
-        $strategy->isFulfilled($aggregateRoot)->shouldBeCalled()->willReturn(true);
+        $strategy->isFulfilled(new StreamName('event_stream'), $aggregateRoot)->shouldBeCalled()->willReturn(true);
 
         $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
 
@@ -129,6 +130,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $snapshotter = new Snapshotter($snapshotStore->reveal(), $strategy->reveal());
 
         $this->eventStore->fromVersion(
+            new StreamName('event_stream'),
             $aggregateRoot->getAggregateRootId(),
             $version
         )->shouldBeCalled()->willReturn($stream);

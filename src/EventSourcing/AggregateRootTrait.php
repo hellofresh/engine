@@ -28,7 +28,7 @@ trait AggregateRootTrait
 
     public function getUncommittedEvents()
     {
-        $stream = new EventStream($this->uncommittedEvents);
+        $stream = $this->uncommittedEvents;
         $this->uncommittedEvents = [];
 
         return $stream;

@@ -5,6 +5,7 @@ namespace HelloFresh\Tests\Engine\EventSourcing;
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\Domain\EventStream;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventStore\EventStoreInterface;
 use HelloFresh\Tests\Engine\Mock\SomethingHappened;
 use Ramsey\Uuid\Uuid;
@@ -22,7 +23,7 @@ abstract class EventStoreTest extends \PHPUnit_Framework_TestCase
      */
     public function it_creates_a_new_entry_when_id_is_new($id)
     {
-        $domainEventStream = new EventStream([
+        $domainEventStream = new EventStream(new StreamName('event_stream'), [
             $this->createDomainMessage($id, 0),
             $this->createDomainMessage($id, 1),
             $this->createDomainMessage($id, 2),
@@ -30,7 +31,7 @@ abstract class EventStoreTest extends \PHPUnit_Framework_TestCase
         ]);
 
         $this->eventStore->append($domainEventStream);
-        $this->assertEquals($domainEventStream, $this->eventStore->getEventsFor($id));
+        $this->assertEquals($domainEventStream, $this->eventStore->getEventsFor(new StreamName('event_stream'), $id));
     }
 
     /**
@@ -41,19 +42,19 @@ abstract class EventStoreTest extends \PHPUnit_Framework_TestCase
     {
         $dateTime = new \DateTimeImmutable("now");
 
-        $domainEventStream = new EventStream([
+        $domainEventStream = new EventStream(new StreamName('event_stream'), [
             $this->createDomainMessage($id, 0, $dateTime),
             $this->createDomainMessage($id, 1, $dateTime),
             $this->createDomainMessage($id, 2, $dateTime),
         ]);
         $this->eventStore->append($domainEventStream);
-        $appendedEventStream = new EventStream([
+        $appendedEventStream = new EventStream(new StreamName('event_stream'), [
             $this->createDomainMessage($id, 3, $dateTime),
             $this->createDomainMessage($id, 4, $dateTime),
             $this->createDomainMessage($id, 5, $dateTime),
         ]);
         $this->eventStore->append($appendedEventStream);
-        $expected = new EventStream([
+        $expected = new EventStream(new StreamName('event_stream'), [
             $this->createDomainMessage($id, 0, $dateTime),
             $this->createDomainMessage($id, 1, $dateTime),
             $this->createDomainMessage($id, 2, $dateTime),
@@ -61,7 +62,7 @@ abstract class EventStoreTest extends \PHPUnit_Framework_TestCase
             $this->createDomainMessage($id, 4, $dateTime),
             $this->createDomainMessage($id, 5, $dateTime),
         ]);
-        $this->assertEquals($expected, $this->eventStore->getEventsFor($id));
+        $this->assertEquals($expected, $this->eventStore->getEventsFor(new StreamName('event_stream'), $id));
     }
 
     /**
@@ -71,7 +72,7 @@ abstract class EventStoreTest extends \PHPUnit_Framework_TestCase
      */
     public function it_throws_an_exception_when_requesting_the_stream_of_a_non_existing_aggregate($id)
     {
-        $this->eventStore->getEventsFor($id);
+        $this->eventStore->getEventsFor(new StreamName('event_stream'), $id);
     }
 
     public function idDataProvider()

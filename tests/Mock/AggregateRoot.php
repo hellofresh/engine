@@ -5,6 +5,7 @@ namespace HelloFresh\Tests\Engine\Mock;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\AggregateRootInterface;
 use HelloFresh\Engine\Domain\EventStream;
+use HelloFresh\Engine\Domain\StreamName;
 use HelloFresh\Engine\EventSourcing\AggregateRootTrait;
 
 class AggregateRoot implements AggregateRootInterface
@@ -69,6 +70,6 @@ class AggregateRoot implements AggregateRootInterface
 
     public function getEventStream()
     {
-        return new EventStream($this->uncommittedEvents);
+        return new EventStream(new StreamName('event_stream'), $this->uncommittedEvents);
     }
 }
