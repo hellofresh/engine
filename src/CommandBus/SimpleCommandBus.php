@@ -2,18 +2,12 @@
 
 namespace HelloFresh\Engine\CommandBus;
 
-use Assert\Assertion;
-use Collections\Dictionary;
-use Collections\MapInterface;
 use Collections\Queue;
+use HelloFresh\Engine\CommandBus\Exception\CanNotInvokeHandlerException;
+use HelloFresh\Engine\CommandBus\Handler\HandlerLocatorInterface;
 
 class SimpleCommandBus implements CommandBusInterface
 {
-    /**
-     * @var MapInterface
-     */
-    private $commandHandlers;
-
     /**
      * @var Queue
      */
@@ -25,21 +19,18 @@ class SimpleCommandBus implements CommandBusInterface
     private $isDispatching = false;
 
     /**
-     * SimpleCommandBus constructor.
+     * @var HandlerLocatorInterface
      */
-    public function __construct()
-    {
-        $this->commandHandlers = new Dictionary();
-        $this->queue = new Queue();
-    }
+    private $handlerLocator;
 
     /**
-     * {@inheritDoc}
+     * SimpleCommandBus constructor.
+     * @param HandlerLocatorInterface $handlerLocator
      */
-    public function subscribe($commandName, $handler)
+    public function __construct(HandlerLocatorInterface $handlerLocator)
     {
-        \Assert\that($commandName)->notEmpty()->string();
-        $this->commandHandlers->add($commandName, $handler);
+        $this->queue = new Queue();
+        $this->handlerLocator = $handlerLocator;
     }
 
     /**
@@ -66,11 +57,16 @@ class SimpleCommandBus implements CommandBusInterface
      */
     private function processCommand($command)
     {
-        $this->commandHandlers->filterWithKey(function ($commandName, $handler) use ($command) {
-            return $commandName === get_class($command);
-        })->each(function ($handler) use ($command) {
-            Assertion::methodExists('handle', $handler);
-            $handler->handle($command);
-        });
+        $handler = $this->handlerLocator->getHandlerForCommand(get_class($command));
+        $methodName = 'handler';
+
+        if (!is_callable([$handler, $methodName])) {
+            throw CanNotInvokeHandlerException::forCommand(
+                $command,
+                "Method '{$methodName}' does not exist on handler"
+            );
+        }
+
+        $handler->handle($command);
     }
 }
