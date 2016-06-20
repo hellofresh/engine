@@ -98,7 +98,12 @@ class AggregateRepository implements AggregateRepositoryInterface
 
         $streamName = $this->determineStreamName($streamName);
         $aggregateRoot = $snapshot->getAggregate();
-        $stream = $this->eventStore->fromVersion($streamName, $aggregateId, $snapshot->getVersion());
+        $stream = $this->eventStore->fromVersion($streamName, $aggregateId, $snapshot->getVersion() + 1);
+
+        if (!$stream->getIterator()->valid()) {
+            return $aggregateRoot;
+        }
+
         $aggregateRoot->replay($stream);
 
         return $aggregateRoot;
