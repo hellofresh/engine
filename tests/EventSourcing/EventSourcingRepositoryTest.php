@@ -132,7 +132,7 @@ class EventSourcingRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->eventStore->fromVersion(
             new StreamName('event_stream'),
             $aggregateRoot->getAggregateRootId(),
-            $version
+            $version + 1
         )->shouldBeCalled()->willReturn($stream);
 
         $repo = new AggregateRepository(
