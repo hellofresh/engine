@@ -3,6 +3,7 @@
 namespace HelloFresh\Tests\Engine\CommandBus;
 
 use HelloFresh\Engine\CommandBus\CommandBusInterface;
+use HelloFresh\Engine\CommandBus\Handler\InMemoryLocator;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Tests\Engine\Mock\InvalidHandler;
 use HelloFresh\Tests\Engine\Mock\TestCommand;
@@ -15,9 +16,15 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
      */
     private $commandBus;
 
+    /**
+     * @var InMemoryLocator
+     */
+    private $locator;
+
     protected function setUp()
     {
-        $this->commandBus = new SimpleCommandBus();
+        $this->locator = new InMemoryLocator();
+        $this->commandBus = new SimpleCommandBus($this->locator);
     }
 
     /**
@@ -26,7 +33,7 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
     public function itExecutesAMessage()
     {
         $handler = new TestHandler();
-        $this->commandBus->subscribe(TestCommand::class, $handler);
+        $this->locator->addHandler(TestCommand::class, $handler);
 
         $command = new TestCommand("hey");
         $this->commandBus->execute($command);
@@ -57,7 +64,7 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
         $command = new TestCommand("hey");
         $handler = new TestHandler();
 
-        $this->commandBus->subscribe($command, $handler);
+        $this->locator->addHandler($command, $handler);
         $this->commandBus->execute($command);
     }
 
@@ -68,7 +75,7 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
     public function itFailsWhenHandlerHasAnInvalidHandleMethod()
     {
         $handler = new InvalidHandler();
-        $this->commandBus->subscribe(TestCommand::class, $handler);
+        $this->locator->addHandler(TestCommand::class, $handler);
 
         $command = new TestCommand("hey");
         $this->commandBus->execute($command);
