@@ -8,7 +8,7 @@ use HelloFresh\Engine\Domain\AggregateRootInterface;
 class Snapshot
 {
     /**
-     * @var string
+     * @var int
      */
     private $version;
 
@@ -50,7 +50,7 @@ class Snapshot
      * Take a snapshot
      * @param AggregateIdInterface $aggregateId
      * @param AggregateRootInterface $aggregate
-     * @param $version
+     * @param int $version
      * @return static
      */
     public static function take(AggregateIdInterface $aggregateId, AggregateRootInterface $aggregate, $version)
@@ -59,7 +59,7 @@ class Snapshot
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getVersion()
     {
