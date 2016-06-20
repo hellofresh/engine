@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Provider;
+namespace HelloFresh\Engine\Provider;
 
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
