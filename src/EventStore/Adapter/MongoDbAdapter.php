@@ -77,24 +77,6 @@ class MongoDbAdapter implements EventStoreAdapterInterface
         return $collection->count($query);
     }
 
-    private function processEvents($serializedEvents)
-    {
-        $eventStream = [];
-
-        foreach ($serializedEvents as $eventData) {
-            $payload = $this->serializer->deserialize($eventData['payload'], $eventData['type'], 'json');
-
-            $eventStream[] = new DomainMessage(
-                $eventData['aggregate_id'],
-                $eventData['version'],
-                $payload,
-                \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.u', $eventData['recorded_on'])
-            );
-        }
-
-        return $eventStream;
-    }
-
     /**
      * Get mongo db stream collection
      *
