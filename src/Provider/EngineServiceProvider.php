@@ -112,7 +112,7 @@ class EngineServiceProvider implements ServiceProviderInterface
 
     private function setUpEventStore(Container $pimple)
     {
-        $pimple["$this->prefix.event_store.adapter.in_memory"] = function (Container $c) {
+        $pimple["$this->prefix.event_store.adapter.in_memory"] = function () {
             return new InMemoryAdapter();
         };
 
@@ -172,7 +172,7 @@ class EngineServiceProvider implements ServiceProviderInterface
 
     private function setUpSnapshotStore(Container $pimple)
     {
-        $pimple["$this->prefix.snapshot_store.adapter.in_memory"] = function (Container $c) {
+        $pimple["$this->prefix.snapshot_store.adapter.in_memory"] = function () {
             return new InMemorySnapshotAdapter();
         };
 
@@ -262,11 +262,11 @@ class EngineServiceProvider implements ServiceProviderInterface
             return new JmsSerializerAdapter($c[$symfonySerializer]);
         };
 
-        $pimple["$this->prefix.serializer.adapter.php_json"] = function (Container $c) {
+        $pimple["$this->prefix.serializer.adapter.php_json"] = function () {
             return new PhpJsonSerializerAdapter();
         };
 
-        $pimple["$this->prefix.serializer.adapter.php"] = function (Container $c) {
+        $pimple["$this->prefix.serializer.adapter.php"] = function () {
             return new PhpSerializerAdapter();
         };
 
