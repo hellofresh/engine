@@ -2,6 +2,7 @@
 
 namespace HelloFresh\Tests;
 
+use HelloFresh\Engine\CommandBus\Handler\InMemoryLocator;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\StreamName;
@@ -60,7 +61,8 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
      */
     public function isShouldStoreEvents($eventStoreAdapter, $snapshotAdapter)
     {
-        $commandBus = new SimpleCommandBus();
+        $locator = new InMemoryLocator();
+        $commandBus = new SimpleCommandBus($locator);
         $eventBus = new SimpleEventBus();
 
         $eventStore = new EventStore($eventStoreAdapter);
@@ -69,7 +71,7 @@ class EventStoreIntegrationTest extends \PHPUnit_Framework_TestCase
 
         $aggregateRepo = new AggregateRepository($eventStore, $eventBus, $snapshotter);
 
-        $commandBus->subscribe(AssignNameCommand::class, new AssignNameHandler($aggregateRepo));
+        $locator->addHandler(AssignNameCommand::class, new AssignNameHandler($aggregateRepo));
 
         $aggregateRoot = AggregateRoot::create(AggregateId::generate(), 'test1');
         $aggregateRepo->save($aggregateRoot);
