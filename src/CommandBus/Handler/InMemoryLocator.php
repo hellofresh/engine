@@ -21,12 +21,15 @@ class InMemoryLocator implements HandlerLocatorInterface
 
     /**
      * Bind a handler instance to receive all commands with a certain class
-     *
-     * @param object $handler Handler to receive class
      * @param string $commandClassName Command class e.g. "My\TaskAddedCommand"
+     * @param object $handler Handler to receive class
      */
-    public function addHandler($handler, $commandClassName)
+    public function addHandler($commandClassName, $handler)
     {
+        if (!is_string($commandClassName)) {
+            throw new \InvalidArgumentException('The command name should be a string');
+        }
+
         $this->handlers[$commandClassName] = $handler;
     }
 
@@ -37,7 +40,7 @@ class InMemoryLocator implements HandlerLocatorInterface
     protected function addHandlers(array $commandClassToHandlerMap)
     {
         foreach ($commandClassToHandlerMap as $commandClass => $handler) {
-            $this->addHandler($handler, $commandClass);
+            $this->addHandler($commandClass, $handler);
         }
     }
 

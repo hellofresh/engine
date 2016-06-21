@@ -45,6 +45,7 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @expectedException \HelloFresh\Engine\CommandBus\Exception\MissingHandlerException
      */
     public function itLosesMessageWhenThereIsNoHandlers()
     {
@@ -57,7 +58,7 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Assert\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function itFailsWhenHaveInvalidSubscriber()
     {
@@ -70,7 +71,7 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Assert\InvalidArgumentException
+     * @expectedException \HelloFresh\Engine\CommandBus\Exception\CanNotInvokeHandlerException
      */
     public function itFailsWhenHandlerHasAnInvalidHandleMethod()
     {

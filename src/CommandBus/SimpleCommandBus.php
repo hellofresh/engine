@@ -58,7 +58,7 @@ class SimpleCommandBus implements CommandBusInterface
     private function processCommand($command)
     {
         $handler = $this->handlerLocator->getHandlerForCommand(get_class($command));
-        $methodName = 'handler';
+        $methodName = 'handle';
 
         if (!is_callable([$handler, $methodName])) {
             throw CanNotInvokeHandlerException::forCommand(

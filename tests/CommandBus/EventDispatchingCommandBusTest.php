@@ -4,6 +4,8 @@ namespace HelloFresh\Tests\Engine\CommandBus;
 
 use HelloFresh\Engine\CommandBus\CommandBusInterface;
 use HelloFresh\Engine\CommandBus\EventDispatchingCommandBus;
+use HelloFresh\Engine\CommandBus\Exception\MissingHandlerException;
+use HelloFresh\Engine\CommandBus\Handler\InMemoryLocator;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
 use HelloFresh\Engine\EventDispatcher\EventDispatcher;
 use HelloFresh\Tests\Engine\Mock\InvalidHandler;
@@ -13,13 +15,19 @@ use HelloFresh\Tests\Engine\Mock\TestHandler;
 class EventDispatchingCommandBusTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var InMemoryLocator
+     */
+    private $locator;
+
+    /**
      * @var CommandBusInterface
      */
     private $commandBus;
 
     protected function setUp()
     {
-        $simpleCommandBus = new SimpleCommandBus();
+        $this->locator = new InMemoryLocator();
+        $simpleCommandBus = new SimpleCommandBus($this->locator);
         $eventDispatcher = new EventDispatcher();
         $this->commandBus = new EventDispatchingCommandBus($simpleCommandBus, $eventDispatcher);
     }
@@ -30,7 +38,7 @@ class EventDispatchingCommandBusTest extends \PHPUnit_Framework_TestCase
     public function itExecutesAMessage()
     {
         $handler = new TestHandler();
-        $this->commandBus->subscribe(TestCommand::class, $handler);
+        $this->locator->addHandler(TestCommand::class, $handler);
 
         $command = new TestCommand("hey");
         $this->commandBus->execute($command);
@@ -42,6 +50,7 @@ class EventDispatchingCommandBusTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @expectedException \HelloFresh\Engine\CommandBus\Exception\MissingHandlerException
      */
     public function itLosesMessageWhenThereIsNoHandlers()
     {
@@ -54,25 +63,25 @@ class EventDispatchingCommandBusTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException \Assert\InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function itFailsWhenHaveInvalidSubscriber()
     {
         $command = new TestCommand("hey");
         $handler = new TestHandler();
 
-        $this->commandBus->subscribe($command, $handler);
+        $this->locator->addHandler($command, $handler);
         $this->commandBus->execute($command);
     }
 
     /**
      * @test
-     * @expectedException \Assert\InvalidArgumentException
+     * @expectedException \HelloFresh\Engine\CommandBus\Exception\CanNotInvokeHandlerException
      */
     public function itFailsWhenHandlerHasAnInvalidHandleMethod()
     {
         $handler = new InvalidHandler();
-        $this->commandBus->subscribe(TestCommand::class, $handler);
+        $this->locator->addHandler(TestCommand::class, $handler);
 
         $command = new TestCommand("hey");
         $this->commandBus->execute($command);
