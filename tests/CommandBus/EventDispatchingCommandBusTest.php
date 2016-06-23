@@ -7,7 +7,7 @@ use HelloFresh\Engine\CommandBus\EventDispatchingCommandBus;
 use HelloFresh\Engine\CommandBus\Exception\MissingHandlerException;
 use HelloFresh\Engine\CommandBus\Handler\InMemoryLocator;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
-use HelloFresh\Engine\EventDispatcher\EventDispatcher;
+use HelloFresh\Engine\EventDispatcher\InMemoryDispatcher;
 use HelloFresh\Tests\Engine\Mock\InvalidHandler;
 use HelloFresh\Tests\Engine\Mock\TestCommand;
 use HelloFresh\Tests\Engine\Mock\TestHandler;
@@ -28,7 +28,7 @@ class EventDispatchingCommandBusTest extends \PHPUnit_Framework_TestCase
     {
         $this->locator = new InMemoryLocator();
         $simpleCommandBus = new SimpleCommandBus($this->locator);
-        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher = new InMemoryDispatcher();
         $this->commandBus = new EventDispatchingCommandBus($simpleCommandBus, $eventDispatcher);
     }
 

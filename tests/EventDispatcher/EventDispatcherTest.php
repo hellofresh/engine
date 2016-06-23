@@ -2,7 +2,7 @@
 
 namespace HelloFresh\Tests\Engine\EventBus;
 
-use HelloFresh\Engine\EventDispatcher\EventDispatcher;
+use HelloFresh\Engine\EventDispatcher\InMemoryDispatcher;
 use HelloFresh\Engine\EventDispatcher\EventDispatcherInterface;
 use HelloFresh\Tests\Engine\Mock\TracableEventListener;
 
@@ -17,7 +17,7 @@ class EventDispatcherTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->dispatcher = new EventDispatcher();
+        $this->dispatcher = new InMemoryDispatcher();
         $this->listener1 = new TracableEventListener();
         $this->listener2 = new TracableEventListener();
         $this->assertFalse($this->listener1->isCalled());
