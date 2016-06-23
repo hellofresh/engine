@@ -8,14 +8,9 @@ namespace HelloFresh\Engine\EventDispatcher;
 interface EventDispatcherInterface
 {
     /**
-     * @param $eventName
+     * Dispatches an event
+     * @param string $eventName The name of the event
      * @param array ...$arguments
      */
     public function dispatch($eventName, ...$arguments);
-
-    /**
-     * @param string $eventName
-     * @param callable $callable
-     */
-    public function addListener($eventName, callable $callable);
 }

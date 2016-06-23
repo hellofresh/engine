@@ -7,9 +7,9 @@ use Collections\Dictionary;
 use Collections\MapInterface;
 
 /**
- * Event dispatcher implementation.
+ * In Memory Event dispatcher implementation.
  */
-class EventDispatcher implements EventDispatcherInterface
+class InMemoryDispatcher implements EventDispatcherInterface, EventListenerInterface
 {
     /**
      * @var MapInterface
