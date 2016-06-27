@@ -2,7 +2,10 @@
 
 namespace HelloFresh\Engine\CommandBus;
 
+use HelloFresh\Engine\CommandBus\Exception\CanNotInvokeHandlerException;
+use HelloFresh\Engine\CommandBus\Exception\MissingHandlerException;
 use League\Tactician\CommandBus;
+use League\Tactician\Exception as TacticianException;
 
 class TacticianCommandBus implements CommandBusInterface
 {
@@ -25,6 +28,12 @@ class TacticianCommandBus implements CommandBusInterface
      */
     public function execute($command)
     {
-        $this->commandBus->handle($command);
+        try {
+            $this->commandBus->handle($command);
+        } catch (TacticianException\MissingHandlerException $e) {
+            throw new MissingHandlerException($e->getMessage(), $e->getCode(), $e);
+        } catch (TacticianException\CanNotInvokeHandlerException $e) {
+            throw new CanNotInvokeHandlerException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }
