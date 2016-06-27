@@ -2,8 +2,9 @@
 
 namespace HelloFresh\Engine\EventStore\Snapshot\Adapter;
 
-use Collections\Dictionary;
+use Collections\Map;
 use Collections\MapInterface;
+use Collections\Pair;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\EventStore\Snapshot\Snapshot;
 
@@ -16,17 +17,17 @@ class InMemorySnapshotAdapter implements SnapshotStoreAdapterInterface
 
     public function __construct()
     {
-        $this->snapshots = new Dictionary();
+        $this->snapshots = new Map();
     }
 
     public function byId(AggregateIdInterface $id)
     {
-        return $this->snapshots->tryGet((string)$id);
+        return $this->snapshots->get((string)$id);
     }
 
     public function save(Snapshot $snapshot)
     {
-        $this->snapshots->add((string)$snapshot->getAggregateId(), $snapshot);
+        $this->snapshots->add(new Pair((string)$snapshot->getAggregateId(), $snapshot));
     }
 
     public function has(AggregateIdInterface $id, $version)

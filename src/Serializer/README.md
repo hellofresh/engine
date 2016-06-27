@@ -21,7 +21,7 @@ use HelloFresh\Engine\Serializer\Adapter\JmsSerializerAdapter;
 $jmsSerializer = SerializerBuilder::create()
     ->setMetadataDirs(['' => __DIR__ . '/metadata'])
     ->configureHandlers(function (HandlerRegistry $registry) {
-        $registry->registerSubscribingHandler(new ArrayListHandler());
+        $registry->registerSubscribingHandler(new VectorHandler());
         $registry->registerSubscribingHandler(new UuidSerializerHandler());
     })
     ->addDefaultHandlers()

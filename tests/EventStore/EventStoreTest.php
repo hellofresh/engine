@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Tests\Engine\EventSourcing;
+namespace HelloFresh\Tests\Engine\EventStore;
 
 use HelloFresh\Engine\Domain\AggregateId;
 use HelloFresh\Engine\Domain\DomainMessage;

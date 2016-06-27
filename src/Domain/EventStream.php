@@ -2,9 +2,9 @@
 
 namespace HelloFresh\Engine\Domain;
 
-use Collections\Immutable\ImmArrayList;
+use Collections\Immutable\ImmVector;
 
-class EventStream extends ImmArrayList
+class EventStream extends ImmVector
 {
     /**
      * @var StreamName

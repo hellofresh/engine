@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Tests\Engine\EventSourcing;
+namespace HelloFresh\Tests\Engine\EventStore;
 
 use HelloFresh\Engine\EventStore\Adapter\InMemoryAdapter;
 use HelloFresh\Engine\EventStore\EventStore;

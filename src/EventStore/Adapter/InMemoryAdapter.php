@@ -2,9 +2,10 @@
 
 namespace HelloFresh\Engine\EventStore\Adapter;
 
-use Collections\ArrayList;
-use Collections\Dictionary;
+use Collections\Map;
 use Collections\MapInterface;
+use Collections\Pair;
+use Collections\Vector;
 use Collections\VectorInterface;
 use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
@@ -20,22 +21,22 @@ class InMemoryAdapter implements EventStoreAdapterInterface
 
     public function __construct()
     {
-        $this->events = new Dictionary();
+        $this->events = new Map();
     }
 
     public function save(StreamName $streamName, DomainMessage $event)
     {
         $id = (string)$event->getId();
         $name = (string)$streamName;
-        $events = $this->events->tryGet($name);
+        $events = $this->events->get($name);
 
-        if (!$events) {
-            $events = new Dictionary();
-            $this->events->add($name, $events);
+        if (null === $events) {
+            $events = new Map();
+            $this->events->add(new Pair($name, $events));
         }
 
         if (!$events->containsKey($id)) {
-            $events->add($id, new ArrayList());
+            $events->add(new Pair($id, new Vector()));
         }
 
         $events->get($id)->add($event);
@@ -47,7 +48,7 @@ class InMemoryAdapter implements EventStoreAdapterInterface
         $name = (string)$streamName;
         /** @var MapInterface $events */
         try {
-            $events = $this->events->get($name);
+            $events = $this->events->at($name);
         } catch (\OutOfBoundsException $e) {
             throw new EventStreamNotFoundException("Stream $name not found", $e->getCode(), $e);
         }

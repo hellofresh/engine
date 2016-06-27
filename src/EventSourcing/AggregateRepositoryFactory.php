@@ -2,7 +2,7 @@
 
 namespace HelloFresh\Engine\EventSourcing;
 
-use Collections\Dictionary;
+use Collections\Map;
 use Collections\MapInterface;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
 use HelloFresh\Engine\EventStore\Adapter\InMemoryAdapter;
@@ -26,10 +26,10 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
     public function __construct($config = null)
     {
         if (!$config instanceof MapInterface) {
-            $config = new Dictionary($config);
+            $config = new Map($config);
         }
 
-        $this->config = new Dictionary([
+        $this->config = new Map([
             'event_bus' => [
                 'service' => new SimpleEventBus()
             ],
@@ -74,7 +74,7 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
     private function configureEventStore(MapInterface $config)
     {
         $adapterName = $config->get('adapter');
-        $arguments = $config->tryGet('arguments', []);
+        $arguments = $config->get('arguments') ? $config->get('arguments') : [];
 
         $adapter = new $adapterName(...$arguments);
 
@@ -84,7 +84,7 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
     private function configureSnapshotStore(MapInterface $config)
     {
         $adapterName = $config->get('adapter');
-        $arguments = $config->tryGet('arguments', []);
+        $arguments = $config->get('arguments') ? $config->get('arguments') : [];
 
         $adapter = new $adapterName(...$arguments);
 
@@ -94,7 +94,7 @@ class AggregateRepositoryFactory implements AggregateRepositoryFactoryInterface
     private function configureSnapshotStrategy(MapInterface $config)
     {
         $adapterName = $config->get('name');
-        $arguments = $config->tryGet('arguments', []);
+        $arguments = $config->get('arguments') ? $config->get('arguments') : [];
 
         return new $adapterName(...$arguments);
     }

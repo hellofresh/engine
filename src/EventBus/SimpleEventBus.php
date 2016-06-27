@@ -2,7 +2,7 @@
 
 namespace HelloFresh\Engine\EventBus;
 
-use Collections\ArrayList;
+use Collections\Vector;
 use Collections\Queue;
 use Collections\VectorInterface;
 use HelloFresh\Engine\Domain\DomainEventInterface;
@@ -32,7 +32,7 @@ class SimpleEventBus implements EventBusInterface
      */
     public function __construct()
     {
-        $this->eventListeners = new ArrayList();
+        $this->eventListeners = new Vector();
         $this->queue = new Queue();
     }
 

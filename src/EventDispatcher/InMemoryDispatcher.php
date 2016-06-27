@@ -2,9 +2,10 @@
 
 namespace HelloFresh\Engine\EventDispatcher;
 
-use Collections\ArrayList;
-use Collections\Dictionary;
+use Collections\Map;
 use Collections\MapInterface;
+use Collections\Pair;
+use Collections\Vector;
 
 /**
  * In Memory Event dispatcher implementation.
@@ -21,7 +22,7 @@ class InMemoryDispatcher implements EventDispatcherInterface, EventListenerInter
      */
     public function __construct()
     {
-        $this->listeners = new Dictionary();
+        $this->listeners = new Map();
     }
 
     /**
@@ -44,7 +45,7 @@ class InMemoryDispatcher implements EventDispatcherInterface, EventListenerInter
     public function addListener($eventName, callable $callable)
     {
         if (!$this->listeners->containsKey($eventName)) {
-            $this->listeners->add($eventName, new ArrayList());
+            $this->listeners->add(new Pair($eventName, new Vector()));
         }
 
         $this->listeners->get($eventName)->add($callable);

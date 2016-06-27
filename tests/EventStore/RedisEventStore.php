@@ -5,7 +5,7 @@ namespace HelloFresh\Tests\Engine\EventSourcing;
 use HelloFresh\Engine\EventStore\Adapter\RedisAdapter;
 use HelloFresh\Engine\EventStore\EventStore;
 use HelloFresh\Engine\Serializer\Adapter\JmsSerializerAdapter;
-use HelloFresh\Engine\Serializer\Type\ArrayListHandler;
+use HelloFresh\Engine\Serializer\Type\VectorHandler;
 use HelloFresh\Engine\Serializer\Type\UuidSerializerHandler;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\SerializerBuilder;
@@ -43,7 +43,7 @@ class RedisEventStore extends EventStoreTest
         $jmsSerializer = SerializerBuilder::create()
             ->setMetadataDirs(['' => realpath(__DIR__ . '/../Mock/Config')])
             ->configureHandlers(function (HandlerRegistry $registry) {
-                $registry->registerSubscribingHandler(new ArrayListHandler());
+                $registry->registerSubscribingHandler(new VectorHandler());
                 $registry->registerSubscribingHandler(new UuidSerializerHandler());
             })
             ->addDefaultHandlers()

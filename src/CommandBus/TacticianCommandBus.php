@@ -2,10 +2,6 @@
 
 namespace HelloFresh\Engine\CommandBus;
 
-use Assert\Assertion;
-use Collections\Dictionary;
-use Collections\MapInterface;
-use Collections\Queue;
 use League\Tactician\CommandBus;
 
 class TacticianCommandBus implements CommandBusInterface
