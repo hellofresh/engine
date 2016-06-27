@@ -2,14 +2,14 @@
 
 namespace HelloFresh\Engine\Serializer\Type;
 
-use Collections\ArrayList;
+use Collections\Vector;
 use Collections\Iterable;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\VisitorInterface;
 
-class ArrayListHandler implements SubscribingHandlerInterface
+class VectorHandler implements SubscribingHandlerInterface
 {
     public static function getSubscribingMethods()
     {
@@ -17,13 +17,13 @@ class ArrayListHandler implements SubscribingHandlerInterface
             [
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
                 'format' => 'json',
-                'type' => 'ArrayList',
+                'type' => 'Vector',
                 'method' => 'serializeCollection'
             ],
             [
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format' => 'json',
-                'type' => 'ArrayList',
+                'type' => 'Vector',
                 'method' => 'deserializeCollection'
             ]
         ];
@@ -42,6 +42,6 @@ class ArrayListHandler implements SubscribingHandlerInterface
         // See above.
         $type['name'] = 'array';
 
-        return new ArrayList($visitor->visitArray($data, $type, $context));
+        return new Vector($visitor->visitArray($data, $type, $context));
     }
 }

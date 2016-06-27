@@ -2,14 +2,14 @@
 
 namespace HelloFresh\Engine\Serializer\Type;
 
-use Collections\Dictionary;
+use Collections\Map;
 use Collections\Iterable;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\VisitorInterface;
 
-class DictionaryHandler implements SubscribingHandlerInterface
+class MapHandler implements SubscribingHandlerInterface
 {
     public static function getSubscribingMethods()
     {
@@ -17,13 +17,13 @@ class DictionaryHandler implements SubscribingHandlerInterface
             [
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
                 'format' => 'json',
-                'type' => 'Dictionary',
+                'type' => 'Map',
                 'method' => 'serializeCollection'
             ],
             [
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format' => 'json',
-                'type' => 'Dictionary',
+                'type' => 'Map',
                 'method' => 'deserializeCollection'
             ]
         ];
@@ -43,6 +43,6 @@ class DictionaryHandler implements SubscribingHandlerInterface
         // See above.
         $type['name'] = 'array';
 
-        return new Dictionary($data, $type, $context);
+        return new Map($data, $type, $context);
     }
 }
