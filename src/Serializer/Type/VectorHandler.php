@@ -3,7 +3,7 @@
 namespace HelloFresh\Engine\Serializer\Type;
 
 use Collections\Vector;
-use Collections\Iterable;
+use Collections\VectorInterface;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
@@ -29,8 +29,12 @@ class VectorHandler implements SubscribingHandlerInterface
         ];
     }
 
-    public function serializeCollection(VisitorInterface $visitor, Iterable $collection, array $type, Context $context)
-    {
+    public function serializeCollection(
+        VisitorInterface $visitor,
+        VectorInterface $collection,
+        array $type,
+        Context $context
+    ) {
         // We change the base type, and pass through possible parameters.
         $type['name'] = 'array';
 

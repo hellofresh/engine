@@ -3,7 +3,7 @@
 namespace HelloFresh\Engine\Serializer\Type;
 
 use Collections\Map;
-use Collections\Iterable;
+use Collections\MapInterface;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
@@ -30,8 +30,12 @@ class MapHandler implements SubscribingHandlerInterface
 
     }
 
-    public function serializeCollection(VisitorInterface $visitor, Iterable $collection, array $type, Context $context)
-    {
+    public function serializeCollection(
+        VisitorInterface $visitor,
+        MapInterface $collection,
+        array $type,
+        Context $context
+    ) {
         // We change the base type, and pass through possible parameters.
         $type['name'] = 'array';
 
