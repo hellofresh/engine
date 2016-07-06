@@ -125,5 +125,4 @@ class AggregateRepository implements AggregateRepositoryInterface
 
         return $streamName;
     }
-
 }

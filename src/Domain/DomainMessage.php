@@ -42,7 +42,7 @@ final class DomainMessage
     }
 
     /**
-     * {@inheritDoc}
+     * @return AggregateIdInterface
      */
     public function getId()
     {

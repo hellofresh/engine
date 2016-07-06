@@ -30,7 +30,9 @@ class SnapshotSchema
     }
 
     /**
+     * @param Schema $schema
      * @param string $table
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addToSchema(Schema $schema, $table)
     {

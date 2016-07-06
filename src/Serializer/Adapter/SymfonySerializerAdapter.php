@@ -3,8 +3,6 @@
 namespace HelloFresh\Engine\Serializer\Adapter;
 
 use HelloFresh\Engine\Serializer\SerializerInterface;
-use JMS\Serializer\DeserializationContext;
-use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface as JmsSerializerInterface;
 use Symfony\Component\Serializer\Serializer;
 

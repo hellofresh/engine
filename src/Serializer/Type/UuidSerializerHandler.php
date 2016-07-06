@@ -7,12 +7,13 @@ use HelloFresh\Engine\Serializer\Exception\InvalidUuidException;
 use JMS\Serializer\AbstractVisitor;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
+use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\Metadata\PropertyMetadata;
 use JMS\Serializer\VisitorInterface;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-class UuidSerializerHandler implements \JMS\Serializer\Handler\SubscribingHandlerInterface
+class UuidSerializerHandler implements SubscribingHandlerInterface
 {
     const PATH_FIELD_SEPARATOR = '.';
     const TYPE_UUID = 'uuid';

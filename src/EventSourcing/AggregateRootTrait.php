@@ -39,7 +39,7 @@ trait AggregateRootTrait
      *
      * @param EventStream $historyEvents
      *
-     * @throws \RuntimeException
+     * @param null $version
      */
     public function replay(EventStream $historyEvents, $version = null)
     {

@@ -31,6 +31,13 @@ class Snapshotter
         $this->strategy = $strategy;
     }
 
+    /**
+     * Takes a snapshot
+     * @param StreamName $streamName
+     * @param AggregateRootInterface $aggregate
+     * @param DomainMessage $message - The domain message
+     * @return bool
+     */
     public function take(StreamName $streamName, AggregateRootInterface $aggregate, DomainMessage $message)
     {
         $id = $aggregate->getAggregateRootId();
@@ -42,6 +49,8 @@ class Snapshotter
         if (!$this->snapshotStore->has($id, $message->getVersion())) {
             $this->snapshotStore->save(Snapshot::take($id, $aggregate, $message->getVersion()));
         }
+
+        return true;
     }
 
     /**

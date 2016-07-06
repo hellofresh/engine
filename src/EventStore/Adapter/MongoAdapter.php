@@ -57,7 +57,9 @@ class MongoAdapter implements EventStoreAdapterInterface
         }
 
         $collection = $this->getCollection($streamName);
-        $serializedEvents = $collection->find($query)->sort(['version' => \MongoCollection::ASCENDING]);;
+        $serializedEvents = $collection
+            ->find($query)
+            ->sort(['version' => \MongoCollection::ASCENDING]);
 
         return $this->processEvents($serializedEvents);
     }

@@ -2,10 +2,10 @@
 
 namespace HelloFresh\Engine\Serializer\Type;
 
-use JMS\Serializer\Handler\SubscribingHandlerInterface;
-use JMS\Serializer\GraphNavigator;
-use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Context;
+use JMS\Serializer\GraphNavigator;
+use JMS\Serializer\Handler\SubscribingHandlerInterface;
+use JMS\Serializer\JsonSerializationVisitor;
 
 class LocalizedDateTimeHandler implements SubscribingHandlerInterface
 {
@@ -21,8 +21,12 @@ class LocalizedDateTimeHandler implements SubscribingHandlerInterface
         );
     }
 
-    public function serializeLocalizedDateTimeToJson(JsonSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
-    {
+    public function serializeLocalizedDateTimeToJson(
+        JsonSerializationVisitor $visitor,
+        \DateTime $date,
+        array $type,
+        Context $context
+    ) {
         $df = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT);
 
         return $df->format($date);

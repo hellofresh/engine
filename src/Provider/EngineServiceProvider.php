@@ -1,8 +1,10 @@
 <?php
 
-namespace HelloFresh\Engine\Provider;
+namespace HelloFresh\Provider;
 
+use HelloFresh\Engine\CommandBus\Handler\InMemoryLocator;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
+use HelloFresh\Engine\CommandBus\TacticianCommandBus;
 use HelloFresh\Engine\EventBus\SimpleEventBus;
 use HelloFresh\Engine\EventSourcing\AggregateRepository;
 use HelloFresh\Engine\EventStore\Adapter\DbalAdapter;
@@ -22,7 +24,6 @@ use HelloFresh\Engine\Serializer\Adapter\PhpJsonSerializerAdapter;
 use HelloFresh\Engine\Serializer\Adapter\PhpSerializerAdapter;
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
-use Predis\Client;
 
 class EngineServiceProvider implements ServiceProviderInterface
 {
@@ -50,7 +51,7 @@ class EngineServiceProvider implements ServiceProviderInterface
     public function register(Container $pimple)
     {
         $pimple["$this->prefix.config"] = $this->defineDefaultConfig();
-        $pimple["$this->prefix.command_bus"] = $this->setUpCommandBus();
+        $pimple["$this->prefix.command_bus"] = $this->setUpCommandBus($pimple);
         $pimple["$this->prefix.event_bus"] = $this->setUpEventBus();
         $pimple["$this->prefix.event_store"] = $this->setUpEventStore($pimple);
         $pimple["$this->prefix.snapshot_store"] = $this->setUpSnapshotStore($pimple);
@@ -62,6 +63,9 @@ class EngineServiceProvider implements ServiceProviderInterface
     private function defineDefaultConfig()
     {
         return [
+            'command_bus' => [
+                'adapter' => 'simple'
+            ],
             'event_store' => [
                 'adapter' => 'in_memory'
             ],
@@ -82,17 +86,43 @@ class EngineServiceProvider implements ServiceProviderInterface
         ];
     }
 
-    private function setUpCommandBus()
+    private function setUpCommandBus(Container $pimple)
     {
-        return function (Container $c) {
-            $commandBus = new SimpleCommandBus();
+        $pimple["$this->prefix.command_bus.locator"] = function () {
+            return new InMemoryLocator();
+        };
+
+        $pimple["$this->prefix.command_bus.simple"] = function (Container $c) {
+            $locator = $c["$this->prefix.command_bus.locator"];
             $mapper = $c["$this->prefix.command_bus.handlers"];
 
             foreach ($mapper as $commandName => $handler) {
-                $commandBus->subscribe($commandName, $handler);
+                $locator->addHandler($handler, $commandName);
             }
 
-            return $commandBus;
+            return new SimpleCommandBus($c["$this->prefix.command_bus.locator"]);
+        };
+
+        $pimple["$this->prefix.command_bus.tactician"] = function (Container $c) {
+            $locator = $c['tactician.locator'];
+            $mapper = $c["$this->prefix.command_bus.handlers"];
+
+            foreach ($mapper as $commandName => $handler) {
+                $locator->addHandler($handler, $commandName);
+            }
+
+            return new TacticianCommandBus($c['tactician.command_bus']);
+        };
+
+        return function (Container $c) {
+            $adapterName = $c["$this->prefix.config"]['command_bus']['adapter'];
+            $service = "$this->prefix.command_bus.$adapterName";
+
+            if (!isset($c[$service])) {
+                throw new \InvalidArgumentException('Invalid event store adapter provided');
+            }
+
+            return $c[$service];
         };
     }
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ilelis
- * Date: 20/06/16
- * Time: 14:53
- */
 
 namespace HelloFresh\Engine\CommandBus\Exception;
 

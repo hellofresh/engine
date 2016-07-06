@@ -4,7 +4,6 @@ namespace HelloFresh\Engine\Domain;
 
 use Assert\Assertion;
 
-
 /**
  * Class StreamName
  *

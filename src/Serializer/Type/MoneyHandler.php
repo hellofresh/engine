@@ -2,17 +2,14 @@
 
 namespace HelloFresh\Engine\Serializer\Type;
 
-use JMS\Serializer\AbstractVisitor;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
-use JMS\Serializer\Metadata\PropertyMetadata;
+use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\VisitorInterface;
 use Money\Currency;
 use Money\Money;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
 
-class MoneyHandler implements \JMS\Serializer\Handler\SubscribingHandlerInterface
+class MoneyHandler implements SubscribingHandlerInterface
 {
     const TYPE_MONEY = 'money';
 

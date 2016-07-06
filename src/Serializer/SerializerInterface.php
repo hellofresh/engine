@@ -7,7 +7,7 @@ interface SerializerInterface
     /**
      * Serializes the given data to the specified output format.
      *
-     * @param object|array|scalar $data
+     * @param object|array $data
      * @param string $format
      * @param null $groups
      * @return string
@@ -22,7 +22,7 @@ interface SerializerInterface
      * @param string $type
      * @param string $format
      * @param null $groups
-     * @return array|scalar|object
+     * @return array|object
      *
      */
     public function deserialize($data, $type, $format, $groups = null);
