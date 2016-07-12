@@ -15,7 +15,8 @@ interface PipelineInterface
     public function through(MiddlewareInterface $middleware);
 
     /**
+     * @param \Closure|null $final
      * @return mixed
      */
-    public function run();
+    public function to(\Closure $final = null);
 }

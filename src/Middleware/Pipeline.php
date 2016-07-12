@@ -46,9 +46,10 @@ class Pipeline implements PipelineInterface
     }
 
     /**
+     * @param \Closure|null $final
      * @return mixed
      */
-    public function run()
+    public function to(\Closure $final = null)
     {
         // If there's no middleware on the stack then just return the passable
         if (empty($this->stack)) {
@@ -58,15 +59,15 @@ class Pipeline implements PipelineInterface
         // Run the middleware stack and return it's value
         return call_user_func(array_reduce(
             $this->stack->toArray(),
-            $this->layer(),
-            $this->core()
+            $this->each(),
+            $this->initial($final)
         ), $this->passable);
     }
 
     /**
      * @return \Closure
      */
-    protected function layer()
+    protected function each()
     {
         return function($next, $middleware)
         {
@@ -78,13 +79,13 @@ class Pipeline implements PipelineInterface
     }
 
     /**
-     * @return \Closure
+     * @return \Closure|null
      */
-    protected function core()
+    protected function initial(\Closure $final = null)
     {
-        return function($passable)
+        return function($passable) use ($final)
         {
-            return is_callable($passable) ? $passable() : $passable;
+            return is_callable($final) ? call_user_func($final, $passable) : $passable;
         };
     }
 }

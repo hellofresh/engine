@@ -14,16 +14,16 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
     {
         $stack = new Pipeline();
 
-        $this->assertEquals('test', $stack->pass('test')->run());
+        $this->assertEquals('test', $stack->pass('test')->to());
     }
 
     public function testMiddlewareProcessesClosure()
     {
         $stack = new Pipeline();
 
-        $this->assertEquals('test', $stack->pass(function() {
-            return 'test';
-        })->run());
+        $this->assertEquals('test', $stack->pass('test')->to(function($passable) {
+            return $passable;
+        }));
     }
 
     public function testPassThroughMiddlware()
@@ -34,7 +34,7 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
             ->through(new BeforeMiddleware)
             ->through(new AfterMiddleware);
 
-        $this->assertEquals('hello world', $stack->run());
+        $this->assertEquals('hello world', $stack->to());
     }
 
     public function testOrderOfMiddlewareDoesntChangeOutput()
@@ -45,7 +45,7 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
             ->through(new AfterMiddleware)
             ->through(new BeforeMiddleware);
 
-        $this->assertEquals('hello world', $stack->run());
+        $this->assertEquals('hello world', $stack->to());
     }
 
     public function testStackConstructedWithMiddleware()
@@ -55,6 +55,6 @@ class PipelineTest extends \PHPUnit_Framework_TestCase
             new AfterMiddleware
         ]);
 
-        $this->assertEquals('hello world', $stack->pass('')->run());
+        $this->assertEquals('hello world', $stack->pass('')->to());
     }
 }
