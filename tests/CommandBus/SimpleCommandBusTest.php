@@ -47,13 +47,10 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
      * @test
      * @expectedException \HelloFresh\Engine\CommandBus\Exception\MissingHandlerException
      */
-    public function itLosesMessageWhenThereIsNoHandlers()
+    public function itFailsWhenThereIsNoHandlers()
     {
         $command = new TestCommand("hey");
         $this->commandBus->execute($command);
-
-        $handler = new TestHandler();
-        $this->assertSame(0, $handler->getCounter());
     }
 
     /**
@@ -66,7 +63,6 @@ class SimpleCommandBusTest extends \PHPUnit_Framework_TestCase
         $handler = new TestHandler();
 
         $this->locator->addHandler($command, $handler);
-        $this->commandBus->execute($command);
     }
 
     /**
