@@ -82,7 +82,6 @@ class DateTimeImmutableHandler implements SubscribingHandlerInterface
 
     private function parseDateTime($data, array $type)
     {
-        dump($data);
         $timezone = isset($type['params'][1]) ? new \DateTimeZone($type['params'][1]) : $this->defaultTimezone;
         $format = $this->getFormat($type);
         $datetime = \DateTimeImmutable::createFromFormat($format, (string)$data, $timezone);
