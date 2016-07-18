@@ -24,8 +24,9 @@ class DomainMessageTest extends \PHPUnit_Framework_TestCase
         \DateTimeImmutable $date
     ) {
         $message = new DomainMessage($aggregateId, $version, $payload, $date);
+
         $this->assertInstanceOf(DomainMessage::class, $message);
-        $this->assertSame($aggregateId, $message->getId());
+        $this->assertSame((string) $aggregateId, $message->getId());
         $this->assertSame($version, $message->getVersion());
         $this->assertSame($payload, $message->getPayload());
         $this->assertEquals($date, $message->getRecordedOn());
@@ -47,6 +48,7 @@ class DomainMessageTest extends \PHPUnit_Framework_TestCase
         \DateTimeImmutable $date
     ) {
         $message = DomainMessage::recordNow($aggregateId, $version, $payload);
+
         $this->assertInstanceOf(DomainMessage::class, $message);
 
         $this->assertNotEmpty((int)$message->getRecordedOn()->format('u'), 'Expected microseconds to be set');

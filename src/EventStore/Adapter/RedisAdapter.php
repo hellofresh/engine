@@ -59,8 +59,8 @@ class RedisAdapter implements EventStoreAdapterInterface
         return count($this->redis->lrange($this->getNamespaceKey($streamName, $aggregateId), 0, -1));
     }
 
-    private function getNamespaceKey(StreamName $streamName, AggregateIdInterface $aggregateId)
+    private function getNamespaceKey(StreamName $streamName, $aggregateId)
     {
-        return "events:{$streamName}:{$aggregateId}";
+        return sprintf('events:%s:%s', $streamName, $aggregateId);
     }
 }

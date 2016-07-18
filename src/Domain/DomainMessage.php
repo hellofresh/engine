@@ -28,14 +28,14 @@ final class DomainMessage
     private $version;
 
     /**
-     * @param string $id
+     * @param AggregateIdInterface|string $id
      * @param $version
      * @param mixed $payload
      * @param \DateTimeImmutable $recordedOn
      */
     public function __construct($id, $version, $payload, \DateTimeImmutable $recordedOn)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
         $this->payload = $payload;
         $this->recordedOn = $recordedOn->setTimezone(new \DateTimeZone('UTC'));
         $this->version = $version;
@@ -58,7 +58,7 @@ final class DomainMessage
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRecordedOn()
     {
@@ -66,7 +66,7 @@ final class DomainMessage
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getType()
     {
