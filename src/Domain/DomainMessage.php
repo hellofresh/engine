@@ -37,12 +37,12 @@ final class DomainMessage
     {
         $this->id = $id;
         $this->payload = $payload;
-        $this->recordedOn = $recordedOn;
+        $this->recordedOn = $recordedOn->setTimezone(new \DateTimeZone('UTC'));
         $this->version = $version;
     }
 
     /**
-     * @return AggregateIdInterface
+     * @return string
      */
     public function getId()
     {
@@ -81,7 +81,9 @@ final class DomainMessage
      */
     public static function recordNow($id, $version, DomainEventInterface $payload)
     {
-        return new DomainMessage($id, $version, $payload, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $recordedOn = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)));
+
+        return new DomainMessage($id, $version, $payload, $recordedOn);
     }
 
     /**

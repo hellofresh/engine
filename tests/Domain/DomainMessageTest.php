@@ -25,10 +25,11 @@ class DomainMessageTest extends \PHPUnit_Framework_TestCase
     ) {
         $message = new DomainMessage($aggregateId, $version, $payload, $date);
         $this->assertInstanceOf(DomainMessage::class, $message);
-        $this->assertEquals($aggregateId, $message->getId());
-        $this->assertEquals($version, $message->getVersion());
-        $this->assertEquals($payload, $message->getPayload());
+        $this->assertSame($aggregateId, $message->getId());
+        $this->assertSame($version, $message->getVersion());
+        $this->assertSame($payload, $message->getPayload());
         $this->assertEquals($date, $message->getRecordedOn());
+        $this->assertEquals(new \DateTimeZone('UTC'), $message->getRecordedOn()->getTimezone());
     }
 
     /**
@@ -47,6 +48,9 @@ class DomainMessageTest extends \PHPUnit_Framework_TestCase
     ) {
         $message = DomainMessage::recordNow($aggregateId, $version, $payload);
         $this->assertInstanceOf(DomainMessage::class, $message);
+
+        $this->assertNotEmpty((int)$message->getRecordedOn()->format('u'), 'Expected microseconds to be set');
+        $this->assertEquals(new \DateTimeZone('UTC'), $message->getRecordedOn()->getTimezone());
     }
 
     public function messageProvider()
@@ -54,7 +58,13 @@ class DomainMessageTest extends \PHPUnit_Framework_TestCase
         return [
             [AggregateId::generate(), 1, new SomethingHappened(), new \DateTimeImmutable()],
             [AggregateId::generate(), 100, new SomethingHappened(), new \DateTimeImmutable()],
-            [AggregateId::generate(), 9999999, new SomethingHappened(), new \DateTimeImmutable()]
+            [AggregateId::generate(), 9999999, new SomethingHappened(), new \DateTimeImmutable()],
+            [
+                AggregateId::generate(),
+                9999999,
+                new SomethingHappened(),
+                \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)))
+            ]
         ];
     }
 }
