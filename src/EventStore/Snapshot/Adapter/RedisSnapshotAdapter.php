@@ -43,7 +43,7 @@ class RedisSnapshotAdapter implements SnapshotStoreAdapterInterface
             'json'
         );
 
-        if (null === $metadata) {
+        if (!is_array($metadata)) {
             return null;
         }
 
@@ -54,11 +54,14 @@ class RedisSnapshotAdapter implements SnapshotStoreAdapterInterface
             'json'
         );
 
+        $createdAt = \DateTimeImmutable::createFromFormat('U.u', $metadata['created_at']);
+        $createdAt->setTimezone(new \DateTimeZone('UTC'));
+
         return new Snapshot(
             $aggregate->getAggregateRootId(),
             $aggregate,
             $metadata['version'],
-            new \DateTimeImmutable("@" . $metadata['created_at'])
+            $createdAt
         );
     }
 
@@ -69,7 +72,7 @@ class RedisSnapshotAdapter implements SnapshotStoreAdapterInterface
     {
         $data = [
             'version' => $snapshot->getVersion(),
-            'created_at' => $snapshot->getCreatedAt()->getTimestamp(),
+            'created_at' => $snapshot->getCreatedAt()->format('U.u'),
             'snapshot' => [
                 'type' => $snapshot->getType(),
                 'payload' => $this->serializer->serialize($snapshot->getAggregate(), 'json')
@@ -89,14 +92,12 @@ class RedisSnapshotAdapter implements SnapshotStoreAdapterInterface
      */
     public function has(AggregateIdInterface $id, $version)
     {
-        $data = $this->redis->hget(static::KEY_NAMESPACE, (string)$id);
-
-        if (!$data) {
+        if (!$this->redis->hexists(static::KEY_NAMESPACE, (string)$id)) {
             return false;
         }
 
         $snapshot = $this->serializer->deserialize(
-            $data,
+            $this->redis->hget(static::KEY_NAMESPACE, (string)$id),
             'array',
             'json'
         );
