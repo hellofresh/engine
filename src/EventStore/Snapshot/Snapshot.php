@@ -43,7 +43,7 @@ class Snapshot
         $this->aggregateId = $aggregateId;
         $this->aggregate = $aggregate;
         $this->version = $version;
-        $this->createdAt = $createdAt;
+        $this->createdAt = $createdAt->setTimezone(new \DateTimeZone('UTC'));
     }
 
     /**
@@ -55,7 +55,9 @@ class Snapshot
      */
     public static function take(AggregateIdInterface $aggregateId, AggregateRootInterface $aggregate, $version)
     {
-        return new static($aggregateId, $aggregate, $version, new \DateTimeImmutable());
+        $dateTime = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)));
+
+        return new static($aggregateId, $aggregate, $version, $dateTime);
     }
 
     /**

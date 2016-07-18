@@ -28,21 +28,21 @@ final class DomainMessage
     private $version;
 
     /**
-     * @param string $id
+     * @param AggregateIdInterface|string $id
      * @param $version
      * @param mixed $payload
      * @param \DateTimeImmutable $recordedOn
      */
     public function __construct($id, $version, $payload, \DateTimeImmutable $recordedOn)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
         $this->payload = $payload;
-        $this->recordedOn = $recordedOn;
+        $this->recordedOn = $recordedOn->setTimezone(new \DateTimeZone('UTC'));
         $this->version = $version;
     }
 
     /**
-     * @return AggregateIdInterface
+     * @return string
      */
     public function getId()
     {
@@ -58,7 +58,7 @@ final class DomainMessage
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getRecordedOn()
     {
@@ -66,7 +66,7 @@ final class DomainMessage
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getType()
     {
@@ -81,7 +81,9 @@ final class DomainMessage
      */
     public static function recordNow($id, $version, DomainEventInterface $payload)
     {
-        return new DomainMessage($id, $version, $payload, new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
+        $recordedOn = \DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', microtime(true)));
+
+        return new DomainMessage($id, $version, $payload, $recordedOn);
     }
 
     /**
