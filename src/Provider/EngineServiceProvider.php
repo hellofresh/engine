@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Provider;
+namespace HelloFresh\Engine\Provider;
 
 use HelloFresh\Engine\CommandBus\Handler\InMemoryLocator;
 use HelloFresh\Engine\CommandBus\SimpleCommandBus;
