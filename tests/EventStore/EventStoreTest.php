@@ -3,7 +3,6 @@
 namespace HelloFresh\Tests\Engine\EventStore;
 
 use HelloFresh\Engine\Domain\AggregateId;
-use HelloFresh\Engine\Domain\AggregateIdInterface;
 use HelloFresh\Engine\Domain\DomainMessage;
 use HelloFresh\Engine\Domain\EventStream;
 use HelloFresh\Engine\Domain\StreamName;
@@ -96,7 +95,7 @@ abstract class EventStoreTest extends \PHPUnit_Framework_TestCase
         return new DomainMessage(
             $id,
             $version,
-            new SomethingHappened(),
+            new SomethingHappened($recordedOn),
             $recordedOn ? $recordedOn : new \DateTimeImmutable("now")
         );
     }

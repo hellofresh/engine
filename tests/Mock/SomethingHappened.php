@@ -14,9 +14,9 @@ class SomethingHappened implements DomainEventInterface
     /**
      * SomethingHappened constructor.
      */
-    public function __construct()
+    public function __construct(\DateTimeInterface $dateTime = null)
     {
-        $this->occurredOn = new \DateTime();
+        $this->occurredOn = $dateTime === null ? $dateTime : new \DateTime();
     }
 
     /**
