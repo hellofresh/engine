@@ -1,6 +1,6 @@
 <?php
 
-namespace HelloFresh\Tests\Engine\EventBus;
+namespace HelloFresh\Tests\Engine\EventDispatcher;
 
 use HelloFresh\Engine\EventDispatcher\InMemoryDispatcher;
 use HelloFresh\Engine\EventDispatcher\EventDispatcherInterface;
