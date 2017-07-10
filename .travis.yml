@@ -39,3 +39,4 @@ script:
 
 after_script:
  - vendor/bin/codacycoverage clover build/logs/clover.xml
+ - if [ "$TRAVIS_SECURE_ENV_VARS" == "true" ]; then bash <(curl -s https://codecov.io/bash) -f build/logs/clover.xml; fi
