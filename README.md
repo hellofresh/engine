@@ -7,8 +7,7 @@
 # hellofresh/engine
 
 [![Build Status](https://travis-ci.org/hellofresh/engine.svg?branch=master)](https://travis-ci.org/hellofresh/engine)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9324580cb791453cb6df44f25da73f81)](https://www.codacy.com/app/hellofresh/engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hellofresh/engine&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/9324580cb791453cb6df44f25da73f81)](https://www.codacy.com/app/hellofresh/engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hellofresh/engine&amp;utm_campaign=Badge_Coverage)
+[![codecov](https://codecov.io/gh/hellofresh/engine/branch/master/graph/badge.svg)](https://codecov.io/gh/hellofresh/engine)
 [![Total Downloads](https://poser.pugx.org/hellofresh/engine/downloads)](https://packagist.org/packages/hellofresh/engine)
 
 Welcome to HelloFresh Engine!!
