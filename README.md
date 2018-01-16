@@ -16,7 +16,7 @@ Engine provides you all the capabilities to build an Event sourced application.
 
 ## Components
 
-Engine is divided in a few small independent components. 
+Engine is divided in a few small independent components.
 
 * [CommandBus](src/CommandBus/README.md)
 * [EventBus](src/EventBus/README.md)
@@ -35,7 +35,7 @@ composer require hellofresh/engine
 
 Here you can check a small tutorial of how to use this component in an orders scenario.
 
-[Tutorial] (docs/how_to.md)
+[Tutorial](docs/01-how_to.md)
 
 ## Contributing
 
