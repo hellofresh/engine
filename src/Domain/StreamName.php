@@ -2,8 +2,6 @@
 
 namespace HelloFresh\Engine\Domain;
 
-use Assert\Assertion;
-
 /**
  * Class StreamName
  *
@@ -22,9 +20,13 @@ class StreamName
      */
     public function __construct($name)
     {
-        Assertion::string($name, 'StreamName must be a string');
-        Assertion::notEmpty($name, 'StreamName must not be empty');
-        Assertion::maxLength($name, 200, 'StreamName should not be longer than 200 chars');
+        if (!\is_string($name)) {
+            throw new \InvalidArgumentException('StreamName must be a string!');
+        }
+        $len = \strlen($name);
+        if ($len === 0 || $len > 200) {
+            throw new \InvalidArgumentException('StreamName must not be empty and not longer than 200 chars!');
+        }
         $this->name = $name;
     }
 
