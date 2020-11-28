@@ -101,7 +101,7 @@ class Order implements AggregateRootInterface
         $this->status = 'Approved';
     }
 
-    private function whenOrderOrderCancelled(OrderCancelled $event)
+    private function whenOrderCancelled(OrderCancelled $event)
     {
         $this->status = 'Cancelled';
     }
@@ -234,7 +234,7 @@ Let's check how that works:
 $customer = new Customer(CustomerId::generate()); //of course this won't be generated every time
 $order = Order::place(OrderId::generate(), $customer);
 
-var_dump($order->getUncommitedEvents()); //you'll get an EventStream with the events that happened 
+var_dump($order->getUncommittedEvents()); //you'll get an EventStream with the events that happened 
 ```
 
 Now all of this needs to make sense for our application... We need to store these events somewhere. For this task 
