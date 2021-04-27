@@ -7,7 +7,6 @@
 # hellofresh/engine
 
 [![Build Status](https://travis-ci.org/hellofresh/engine.svg?branch=master)](https://travis-ci.org/hellofresh/engine)
-[![codecov](https://codecov.io/gh/hellofresh/engine/branch/master/graph/badge.svg)](https://codecov.io/gh/hellofresh/engine)
 [![Total Downloads](https://poser.pugx.org/hellofresh/engine/downloads)](https://packagist.org/packages/hellofresh/engine)
 
 Welcome to HelloFresh Engine!!
