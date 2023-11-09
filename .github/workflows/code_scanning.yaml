@@ -1,0 +1,44 @@
+---
+name: "PR: Code Scanning"
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: '30 4 * * 6'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  analyze:
+    name: scanning
+    runs-on: [ self-hosted, default ]
+    timeout-minutes: 15
+    steps:
+      - name: Import Secrets
+        id: vault-secrets
+        uses: hellofresh/jetstream-ci-scripts/actions/vault@master
+        with:
+          shared-secrets: |
+            common/data/defaults GITHUB_TOKEN | GITHUB_TOKEN;
+            common/data/defaults SONAR_TOKEN | SONAR_TOKEN ;
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: SonarQube Scan
+        uses: hellofresh/jetstream-ci-scripts/actions/sonar-scanner@master
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_HOST_URL: "https://sonarqube.tools-k8s.hellofresh.io"
+        with:
+          args: >
+            -Dsonar.php.coverage.reportPaths=./coverage.xml
+            -Dproject.settings=./.github/assets/sonar-project.properties
+            -Dsonar.scm.revision=${{ github.event.pull_request.head.sha }}
